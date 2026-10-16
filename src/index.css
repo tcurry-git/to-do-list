@@ -1,0 +1,395 @@
+*,
+*::before,
+*::after{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html{
+    font-size: 100%;
+    scroll-behavior: smooth;
+    /* reserves space for scrollbar */
+    scrollbar-gutter: stable;
+    /* allows for smooth transitions on heights and other */
+    interpolate-size: allow-keywords;
+}
+
+:root {
+  /* COLOR TOKEN DARK THEME */
+  --clr-primary-dt: grey;
+  --clr-secondary-dt: lightgrey;
+  /* COLOR TOKENS LIGHT THEME */
+  --clr-primary: lightgrey;                  
+  --clr-secondary: grey;  
+  --clr-grey-muted: hsl(0, 0%, 58%); /* for things of low importance like copyright */     
+  --clr-surface-muted: hsl(0, 0%, 95%); 
+  --clr-default-hover: lightgrey; 
+  --clr-default-border: hsl(0, 10%, 90%);             
+  --clr-default-shadow: hsl(0, 6%, 66%);             
+  --clr-lightblue: hsl(201, 100%, 67%); /* generally for buttons */  
+  --clr-active-link: black;  
+  --clr-inline-link-unvisited: hsl(225, 100%, 58%);
+  --clr-gold: rgb(251, 251, 37); 
+  --clr-red: hsl(0, 100%, 50%);
+  --clr-lightred: hsl(0, 100%, 79%);
+  --clr-green: hsl(128, 88%, 38%);
+  --clr-blue: hsl(228, 100%, 57%);
+  --clr-lightgreen: hsl(120, 98%, 82%);
+  --clr-valid-input: hsl(120, 67%, 53%);
+  --clr-invalid-input: hsl(0, 65%, 51%);
+  /* TYPOGRAPHY - FONT SIZES */
+  --fs-base: clamp(1rem, calc(3rem - 5vw), 1.05rem);
+  --fs-3xs: 0.75rem; /* for even smaller details */
+  --fs-2xs: clamp(0.75rem, calc(0.75rem + 1vw - 4px) , 0.85rem); /* smaller details */
+  --fs-xs: 1.1rem; /* for mainly h6 */
+  --fs-sm: 1.25rem; /* for mainly h5 */
+  --fs-md: clamp(1.3rem, 5vw, 1.5rem); /* for mainly h4 */
+  --fs-lg: clamp(1.5rem, 5vw, 1.75rem); /* for mainly h3 */
+  --fs-xl: clamp(1.8rem, 5vw, 2.25rem); /* for mainly h2 */
+  --fs-2xl: clamp(2.8rem, 10vw, 5.5rem); /* for mainly h1 */
+  /* TYPOGRAPHY - LINE HEIGHTS */
+  /* Dont need to change this as lh should change for each html text tag h1-6 */
+  --lh-base: 1.5;
+  --lh-tight: 1.1;
+  --lh-snug: 1.25;
+  --lh-wide: 1.4;
+  --lh-relaxed: 1.8;
+  /* TYPOGRAPHY - FONT WEIGHTS */
+  --fw-light: 300;
+  --fw-base: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-boldest: 900; /* h1 and h2 */
+  /* TYPOGRAPH - LETTER SPACING */ 
+  --ls-tight: -0.02em;
+  --ls-snug: -0.008em;
+  --ls-wide: 0.01em;
+  --ls-relaxed: 0.02em;
+  /* SPACING SCALE */
+  --space-5xs: 0.125rem;
+  --space-4xs: 0.25rem;
+  --space-3xs: 0.5rem;
+  --space-2xs: 0.75rem;
+  --space-xs: 1rem;
+  --space-sm: 1.25rem;
+  --space-md: 1.5rem;
+  --space-lg: 1.75rem;
+  --space-xl: 2rem;
+  --space-2xl: clamp(2.5rem, 5vw, 3rem);
+  --space-3xl: clamp(3rem, 5vw, 4rem);
+  --space-4xl: clamp(4rem, 5vw, 5rem);
+  --space-5xl: clamp(5rem, 8vw, 6rem);
+  --space-6xl: clamp(6rem, 8vw, 8rem);
+  /* ICON SIZING */
+  --icon-2xs: 0.75rem;
+  --icon-xs: 1rem;     
+  --icon-sm: 1.25rem; 
+  --icon-md: clamp(1.2rem, calc(1.1rem + 1vw - 4px), 1.5rem); 
+  --icon-lg: clamp(1.6rem, calc(1.1rem + 1vw - 4px), 1.75rem);
+  --icon-xl: 2rem; 
+  --icon-2xl: 3rem;  
+  /* BORDER RADIUS SCALE */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px; /* for pill shape */
+  --radius-round: 50%; /* perfect cirlce */
+  /* OTHER */
+  --drainpipe-width: clamp(1rem, calc(100vw - 600px), 3.2rem);
+  --active-btn-style:  color-mix(in srgb, var(--clr-secondary) 50%, black); /* mixes current style with 15% black */
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --clr-primary: var(--clr-primary-dt);
+    --clr-secondary: var(--clr-secondary-dt);
+  }
+}
+video:picture-in-picture{ /* selects video thats currently in picture in picture mode*/
+    /* do something */
+}
+body{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  background-color: #ffffff;
+  /* allows footer to always stick to bottom */
+  /* min-block-size: 100svb;
+  display: grid;
+  grid-template-rows: auto 1fr auto; auto for header (navbar), 1fr main, auto footer */
+  /* Enable Font Anti-Aliasing for macOS/iOS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Apply globally to all focusable elements*/
+body.user-is-tabbing :is(a, button, select, textarea, input, summary, [tabindex]):focus-visible {
+  position: relative;  
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  outline-style: dashed;
+  z-index: 1;           
+} 
+/* Apply text-box trimming strictly to typography tags */
+/* h1, h2, h3, h4, h5, h6, p, li, span, button, label {
+   text-box: trim-both cap alphabetic; /* this is for the text to be aligned with the top of the box, but it doesn't work in firefox * /
+} */
+
+.text-2xl{ /* for mainly h1 */
+  font-size: var(--fs-2xl); 
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-boldest);
+  letter-spacing: var(--ls-tight);
+  overflow-wrap: break-word;
+}
+.text-xl{ /* for mainly h2 */
+  font-size: var(--fs-xl); 
+  line-height: var(--lh-snug);
+  font-weight: var(--fw-boldest);
+  letter-spacing: var(--ls-snug);
+  overflow-wrap: break-word;
+}
+.text-lg{ /* for mainly h3 */
+  font-size: var(--fs-lg); 
+  line-height: var(--lh-wide);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-wide);
+  overflow-wrap: break-word;
+}
+:is(.text-md){ /* for mainly h4 */
+  font-size: var(--fs-md);
+  line-height: var(--lh-wide);
+  font-weight: var(--fw-bold); 
+  letter-spacing: var(--ls-wide);
+  overflow-wrap: break-word;
+}
+.text-sm{ /* for mainly h5 */
+  font-size: var(--fs-sm); 
+  line-height: var(--lh-wide);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  overflow-wrap: break-word;
+}
+.text-xs{ /* for mainly h6 */
+  font-size: var(--fs-xs);
+  line-height: var(--lh-relaxed);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-relaxed);
+  overflow-wrap: break-word;
+}
+.text-2xs{ /* small details */
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-wide);
+  letter-spacing: var(--ls-relaxed);
+}
+.text-3xs{
+  font-size: var(--fs-3xs);
+  line-height: var(--lh-wide);
+  letter-spacing: var(--ls-relaxed);
+}
+
+.separator-line-bottom{
+  border-bottom: 1px solid var(--clr-default-border);
+}
+.container{
+  width: 100%;
+}
+.content-container{
+  max-width: 100%;
+  padding-inline: var(--drainpipe-width);
+  margin: 0 auto;
+}
+.section-container{
+  max-width: 100%;
+  margin: 0 auto;
+  padding: clamp(var(--space-5xl), calc(var(--space-5xl) + 1vw - 6px), var(--space-6xl)) var(--drainpipe-width) 
+  clamp(var(--space-2xl), calc(var(--space-2xl) + 1vw - 6px), var(--space-6xl)) var(--drainpipe-width);
+}
+.narrow-section-container{
+  max-width: 100%;
+  margin-inline: auto;
+  padding: var(--space-5xl) calc(var(--drainpipe-width) * 3) var(--space-5xl) calc(var(--drainpipe-width) * 3);
+}
+.flex-container{
+  display: flex;
+}
+/* 4. Make media elements block-level and responsive */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+i{
+  font-size: var(--icon-md); /* maybe o+don't do this, just manually set all font sizes */
+  padding: 0;
+  margin: 0;
+  display: block;
+}
+
+/* 5. Inherit typography for form controls (inputs normally ignore parent fonts) */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* input::placeholder{
+  font-weight: normal;
+} */
+input{
+  max-width: max-content;
+  padding: var(--space-xs) var(--space-xs) ;
+  border: 2px solid transparent;
+  /* max-width: max-content; */
+}
+input[disabled="true"]{
+  background-color: grey;
+}
+input[aria-invalid="false"]{
+  border-color: var(--clr-valid-input);
+}
+input[aria-invalid="true"]{
+  border-color:var(--clr-invalid-input);
+}
+.input-container{ 
+  position: relative;
+  & label{
+    position: absolute;
+    padding: var(--space-5xs);
+    border-radius: var(--radius-full);
+    color: var(--clr-grey-muted);
+    top: 50%;
+    transform: translateY(-50%);
+    left: var(--space-xs);
+    pointer-events: none; /* its on top of input so clicks would be bloked otherwise */
+    transition: transform 0.25s ease, top 0.25s ease, left 0.25s, font-size 0.25s ease, color 0.25s ease;
+    will-change: top, font-size;
+  }
+  & input:focus ~ label,
+  & input:not(:placeholder-shown) ~ label{
+    top: 0;
+    left: var(--space-2xs);
+    font-size: var(--fs-3xs);
+    background-color: transparent;
+  }
+  & input.valid-input ~ label{
+    color: var(--clr-valid-input);
+    outline: 2px solid var(--clr-valid-input); /* outline otherwise is slightly jolts left after unfocus */
+  }
+  & input.invalid-input ~ label{
+    color: var(--clr-invalid-input);
+    outline: 2px solid var(--clr-invalid-input);
+  }
+}
+.label-implicit{
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  cursor: pointer;
+}
+/* ERR MESSAGE POPUPS */
+:is([data-tooltip-container]){
+  position: relative;
+  overflow: visible;
+   /* position-anchor: --input; */
+}
+
+address{
+  display: inline; /* block level element by default so always goes on to new line - annoying */
+  font-style: normal;
+}
+ul li{
+  list-style: none;
+}
+nav ul li a{
+  display: block;
+}
+a{
+  text-decoration-skip-ink: auto; 
+  text-decoration: none;
+  color: inherit;
+}
+
+a.inline-link{
+  color: var(--clr-inline-link-unvisited);
+  text-decoration: underline;
+}
+
+a, button, input:is([type="checkbox"], 
+input[type="color"], input[type="time"]::-webkit-calendar-picker-indicator){
+  cursor: pointer;
+}
+
+button{
+  display: block;
+  border: 0;
+  background: none;
+  line-height: 1;
+}
+
+:is(.button){ /* for actual buttons */
+  /* button styles*/
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  background-color: var(--clr-secondary); 
+  padding: clamp(var(--space-2xs), calc(var(--space-2xs) + 1vw - 4px), var(--space-xs)); /* I want gap of --space-2xs on <=400px width so 1% of 400px is 4px. We are taking 1% bc we use 1vw*/
+  max-width: max-content;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  /* text-box: trim-both cap alphabetic; not supported in firefox */
+  touch-action: manipulation; /* ?? */
+    
+    &:hover:active { /* the active state should only appear if the mouse is within the bounds on the element */
+      /* Mixes the current background color with 15% black */
+      background-color: var(--active-btn-style);
+    }
+}
+strong{
+  font-weight: var(--fw-semibold);
+}
+p, q, code {
+  /* max-width: 60ch; */
+  /* don't put letter spacing here */
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  
+}
+code {
+  background-color: #313131; /* Dark grey background */
+  color: #aaa7a7;           /* Light text */
+  padding: var(--space-5xs) var(--space-3xs);      /* Spacing around the text */
+  border-radius: var(--radius-sm);        /* Rounded corners */
+  font-family: monospace;    /* Ensures monospace font */
+}
+/* 6. Automatically disable/minimize animations for users with motion sensitivity */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[role="option"]:is(
+  :focus-visible,
+  :hover,
+  :active){
+    background-color: var(--clr-surface-muted);
+}
+/*  random */
+.box{
+  padding: 1.25rem;
+  border: 2px solid;
+  max-width: max-content;
+  margin: auto auto;
+}
+.box:first-child{
+  margin-top: 10rem;
+}

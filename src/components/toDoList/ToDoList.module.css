@@ -1,0 +1,22 @@
+.addTaskBtn{
+    padding: var(--space-xs);
+    background-color: rgb(86, 208, 86);
+    font-weight: var(--fw-semibold);
+}
+.deleteBtn{
+    padding: var(--space-2xs);
+    background-color: rgb(195, 59, 59);
+    font-weight: var(--fw-semibold);
+    border-radius: var(--radius-full);
+}
+.switchTaskBtn{
+    padding: var(--space-2xs);
+    background-color: rgb(39, 113, 157);
+    font-weight: var(--fw-semibold);
+    border-radius: var(--radius-full);
+    color :aliceblue;
+}
+.taskText{
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+}

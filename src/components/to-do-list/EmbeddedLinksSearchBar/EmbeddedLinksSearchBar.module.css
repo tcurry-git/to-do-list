@@ -1,0 +1,76 @@
+:is(.searchBtn, .clearSearchQueryBtn){
+    transform: none !important;
+}
+:where(.searchBtn, .clearSearchQueryBtn, .searchOpt):is(:focus-visible, :hover){
+    background-color: var(--clr-surface-muted);
+}
+.searchBar{
+    display: flex;
+    border: 2px solid var(--clr-default-border);
+    border-radius: var(--radius-full);
+    width: 100%;
+    & .searchBtn{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 var(--space-sm);
+        border-left: 2px solid var(--clr-default-border);
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+        &:focus-visible{
+            z-index: 1;
+        }
+    }
+}
+.searchBox{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+.search{
+    width: 100%;
+    border: 0;
+    border-top-left-radius: var(--radius-full);
+    border-bottom-left-radius: var(--radius-full);
+}
+.clearSearchQueryBtn{
+    width: var(--icon-sm);
+    margin-inline-end: var(--space-2xs);
+    padding: var(--space-5xs);
+    border-radius: var(--radius-full);
+}
+.searchItems{
+    width: 100%;
+    position: absolute;
+    top: calc(100% + 5px);
+    display: grid;
+    background-color: white;
+    border-radius: var(--radius-lg);
+    z-index: 1;
+    & > :not(:last-child){
+        border-bottom: 1px solid var(--clr-default-border);
+    }
+    & :first-child{
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+    & :last-child{
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+    & .searchOpt{
+        width: 100%;
+        display: flex;
+        justify-content: left;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: var(--space-2xs) var(--space-2xs);
+        &.searchOptSelected{
+            background-color: var(--clr-surface-muted);
+            outline: 2px solid black;
+            z-index: 1;
+        }
+    }
+}

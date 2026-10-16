@@ -1,0 +1,145 @@
+.topBar{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+}
+.toggleThemeBtn{
+    background-color: lightgrey;
+    padding: var(--space-2xs);
+    border-radius: var(--radius-full);
+}
+.flashcardContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-lg);
+}
+.ghostFlashcard{
+    max-width: 500px;
+    padding: var(--space-lg);
+    margin: 0 var(--space-sm);
+    & .submitFlashcard{
+        width: 100%;
+        background-color: rgb(71, 216, 71);
+        padding: var(--space-sm);
+        font-weight: var(--fw-semibold);
+        color: black;
+    }
+    /*support checks if the browser supports the argument, if not, it just skips over it */
+    @supports(anchor-name: --anchor){ /* button is an automatic anchor point that the popover can latch on to*/
+        position-area: right span-bottom;
+    }
+    &:popover-open{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    & input{
+        min-width: 100%;
+    }
+}
+.tagsContainer{
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.tagBtn{
+    max-width: max-content;
+    font-size: var(--fs-2xs);
+    padding: var(--space-3xs);
+    border-radius: var(--radius-full);
+    font-weight: var(--fw-semibold);
+}
+.mathsTag{
+    background-color: red;
+}
+.englishTag{
+    background-color: forestgreen;
+}
+.scienceTag{
+    background-color: lightseagreen;
+}
+.geographyTag{
+    background-color: lightgreen;
+}
+.musicTag{
+    background-color: skyblue;
+}
+.csTag{
+    background-color: silver;
+}
+.engineeringTag{
+    background-color: orange;
+}
+.businessTag{
+    background-color: burlywood;
+}
+.addDelFlashcardContainer{
+    width: max-content;
+    display: flex;
+    gap: var(--space-sm);
+    & .addFlashcardBtn{
+        background-color: rgb(71, 216, 71);
+        padding: var(--space-sm);
+        font-weight: var(--fw-semibold);
+        color: black;
+    }
+    & .delAllFlashcardsBtn{
+        background-color: red;
+        padding: var(--space-sm);
+        font-weight: var(--fw-semibold);
+        color: black;
+    }
+}
+.flashcardGrid{
+    max-width: 1000px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* so min-width has to be width of container / 4 so 1000px / 4 ??*/
+    gap: var(--space-lg);
+}
+.flashcard{
+    max-width: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-lg);
+    gap: var(--space-2xl);
+    box-shadow: 0 4px 8px var(--clr-default-shadow);
+    text-align: center;
+    & .topOfFlashcard{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    & button{
+        color: rgb(206, 37, 37);
+        align-self: flex-end;
+        font-size: var(--icon-sm);
+        cursor: pointer;
+    }
+    & span{
+        font-weight: var(--fw-semibold);
+    }
+    & p{
+        -webkit-user-select: none;
+        user-select: none;
+        max-width: 30ch;
+        word-break: break-all;
+    }
+    &.correctAnswer{
+        border: 2px dotted green;
+        background-color: lightgreen;
+    }
+}

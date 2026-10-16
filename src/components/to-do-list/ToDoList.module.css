@@ -1,0 +1,331 @@
+:root{
+    --clr-grad-primary: oklch(21.623% 0.14987 264.073) ;
+    --clr-grad-accent: oklch(49.747% 0.22872 328.352);
+    --clr-soft-lightblue: hsl(202, 84%, 88%); 
+    --sm-shadow: 0 1.5px 10px var(--clr-soft-lightblue);
+    --lg-shadow: 0 2px 12px var(--clr-soft-lightblue);
+}
+:is(button, [role="button"]){
+  transition: transform 0.1s ease;
+}
+:is(button, [role="button"]):is(:focus-visible, :hover){
+  transform: scale(1.08);
+}
+
+/*can we create base styles for the reminder?*/
+.reminderTaskActive{
+    max-width: 40ch;
+    top: 0;
+    right: 2rem;
+    position: absolute;
+    padding: var(--space-2xs);
+    font-weight: var(--fw-semibold);
+    background-color: rgb(148, 221, 255);
+    border: 2px solid rgb(74, 201, 255);
+    border-top: 0;
+    border-bottom-right-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+
+}
+.reminderTaskExpired{
+    max-width: 40ch;
+    top: 0;
+    right: 2rem;
+    position: absolute;
+    padding: var(--space-2xs);
+    font-weight: var(--fw-semibold);
+    background-color: rgb(148, 221, 255);
+    border: 2px solid var(--clr-red);
+    border-top: 0;
+    border-bottom-right-radius: var(--radius-md);
+    border-bottom-left-radius: var(--radius-md);
+}
+@media (max-width: 1200px){
+    .reminderTaskActive,
+    .reminderTaskExpired{
+        right: 50%;
+        transform: translate(-50%, 0);
+    }
+}
+
+
+.toDoList{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    & .toDoListContainer{
+        max-width: 680px;
+        width: 100%;
+        height: 100vh;
+        display: grid;
+        justify-items: center;
+        gap: var(--space-lg);
+        /* background-image: linear-gradient(to bottom, var(--clr-grad-primary), var(--clr-grad-accent)); */
+        & section:first-child{
+            padding-top: var(--space-lg);
+        }
+        & section{
+            padding-block: var(--space-3xs);
+        }
+    }
+}
+.addNewTaskContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    & .addTaskBtn{
+        --addTaskBtn-minw: 50%;
+        width: clamp(var(--addTaskBtn-minw), calc(150% - 100vw * 0.1), 100%);
+        display: flex;
+        gap: var(--space-3xs);
+        justify-content: center;
+        align-items: center;
+        text-transform: capitalize;
+        font-size: var(--fs-md);
+        background-color: var(--clr-green);
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-full);
+  
+    }
+}
+
+
+
+.taskManipulationWidgets{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: clamp(0px, 8vw, var(--space-2xl));
+    & .taskSearchBar{
+        flex: 1;
+    }
+    & .actionBtnsContainer{
+        --inner-btn-gap:var(--space-4xs);
+        display: flex;
+        & .actionBtns{
+            display: inline-flex;
+            gap: var(--space-xs);
+        }
+        & button:not(.actionBtnsController){
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--clr-soft-lightblue);
+            padding: var(--space-3xs);
+            border-radius: var(--radius-full);
+        }
+        & .filterBtn,
+        & .unfavoriteAllBtn,
+        & .deleteAllBtn{
+            display: flex;
+            align-items: center;
+            gap: var(--inner-btn-gap);
+        }
+       
+    }
+    @media (max-width: 600px){
+        .sliderContainer{
+        --border-radii: var(--radius-md);
+        --dist-from-top: 24dvh;
+        position: fixed;
+        top: var(--dist-from-top);
+        right: 0;
+        transform: translateX(100%); 
+        background-color: transparent;
+        transition: transform 0.5s ease;
+        isolation: isolate;
+            &.sliderOpen{
+                transform: translateX(0);
+                & .actionBtns{
+                    box-shadow: var(--sm-shadow);
+                }
+            }
+            & .actionBtnsContainer{
+                position: relative;
+                max-width: max-content;
+                & button:not(.actionBtnsController){
+                    min-width: 100%;
+                }
+                & .actionBtnsController{ 
+                    --dist-from-left: 0.5rem;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    transform: translateX(-100%);
+                    padding: var(--space-3xs) var(--space-sm);
+                    background-color: var(--clr-soft-lightblue);
+                    border-radius: var(--border-radii);
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    transition: background-color 0.25s ease;
+                    z-index: 2;
+                }
+                & .actionBtns{
+                    position: relative;
+                    display: grid;
+                    background-color: white;
+                    border-bottom-left-radius: var(--border-radii);
+                    border-top-left-radius: var(--border-radii);
+                    border-top-left-radius: 0;
+                    padding: var(--space-2xs);
+                    box-shadow: 0;
+                    transition: box-shadow 0.25s ease 0.05s;
+                    z-index: 1;
+                }
+            }
+            &.sliderOpen .actionBtnsController{
+                background-color: color-mix(in srgb, var(--clr-soft-lightblue) 90%, grey 10%);
+            }
+        }   
+    }
+}
+
+.tasksList{
+    display: grid;
+    gap: var(--space-sm);
+    & .taskCard{
+        --taskCard-btn-gap: clamp(var(--space-4xs), calc(var(--space-4xs) + 1vw - 4px), var(--space-3xs));
+        position: relative;
+        max-width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: clamp(var(--space-sm), calc(var(--space-sm) + 1vw - 4px), var(--space-lg));
+        padding: clamp(var(--space-xs), calc(100vw - 600px), var(--space-sm));
+        border: 1px solid var(--clr-soft-lightblue);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--lg-shadow);
+        background-color: white;
+        transform: scale(1);
+        opacity: 1;
+        transition: border-color 0.75s ease,  background-color 0.75s ease, transform 0.5s ease, opacity 5s ease 3s;
+        will-change: border-color, background-color, transform, opacity;
+        & button{
+            padding: 0 var(--space-4xs)
+        }
+        &.taskCompleted{
+            border-color: var(--clr-green);
+            background-color: var(--clr-lightgreen);
+            opacity: 0;
+        }
+        &.taskExpired{
+            border-color: var(--clr-red);
+            background-color: var(--clr-lightred);
+            & input{
+                text-decoration: line-through;
+            }
+        }
+        & .taskWarningWidget,
+        & .taskExpiredWidget{
+            --widg-top-dist: -.6rem;
+            --widg-right-dist: -.6rem;
+            position: absolute;
+            top: var(--widg-top-dist);
+            right: var(--widg-right-dist);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-5xs);
+            border-radius: var(--radius-full);
+        }
+        & .taskWarningWidget{
+            background-color: rgb(255, 207, 117);
+            border: 2px solid orangered;
+        }
+        & .taskExpiredWidget{
+            background-color: var(--clr-lightred);
+            border: 2px solid var(--clr-red);
+        }
+        &.taskCardEditing{
+            transform: scale(1.04);
+            z-index: 1000;
+        }
+        & .editingActionBtns{
+           position: absolute;
+           bottom: calc(100% + clamp(var(--space-xs), calc(var(--space-xs) + 1vw - 6px), var(--space-xl)));
+           left: 50%;
+           transform: translateX(-50%);
+           display: flex;
+           align-items: stretch; /* ****NEED TIMER FOR EXPIRED TASK AS WELL */
+           gap: clamp(var(--space-sm), calc(var(--space-sm) + 1vw - 4px), var(--space-md));
+           z-index: 1000;
+           & :is(.saveChangesBtn, .cancelEditBtn, .resetEditBtn){
+                position: relative;
+                width: 100%;
+                flex: 1;
+                padding: clamp(var(--space-3xs), calc(var(--space-3xs) + 1vw - 4px), var(--space-xs));
+                border-radius: var(--radius-full);
+                border: 2px solid;
+           }
+           & .saveChangesBtn{
+                background-color: var(--clr-green) ;
+           }
+           & .cancelEditBtn{
+                background-color: var(--clr-red);
+           }
+           & .resetEditBtn{
+                background-color: var(--clr-lightblue);
+           }    
+        }
+        & .taskInputs{
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            gap: clamp(var(--space-sm), calc(var(--space-sm) + 1vw - 4px), var(--space-md));
+            & .completeEditing{
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: var(--space-xs);
+            }
+            & input{
+                max-width: 100%;
+                width: 100%;
+                padding: 0;
+                border: 0;
+            }
+            & .task{
+                position: relative;
+                line-height: var(--lh-base);
+                font-size: clamp(var(--fs-xs), calc(var(--fs-xs) + 1vw - 4px), var(--fs-sm));
+                overflow-x: scroll;
+            }
+            & .taskDeadline{
+                display: flex;
+                align-items: center;
+                gap: var(--space-4xs);
+                font-size: clamp(var(--fs-2xs), calc(var(--fs-2xs) + 1vw - 4px), var(--fs-xs));
+                & .deadlineDate{
+                    position: relative;
+                    max-width: 9.5ch;
+                }
+                 & .deadlineTime{
+                    position: relative;
+                    max-width: 4.5ch;
+                }
+            }
+        }
+        & .taskBtns{
+            display: grid;
+            align-content: space-between;
+            justify-items: flex-end;
+            max-width: max-content;
+            & .taskOperationalBtns{
+                display: flex;
+                gap: var( --taskCard-btn-gap);
+            }
+            
+            & .taskActionBtnsList{
+                display: flex;
+                align-items: center;
+                gap: var(--taskCard-btn-gap)
+            }
+    
+        
+        }
+    }
+}
