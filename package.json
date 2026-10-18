@@ -1,4 +1,5 @@
 {
+  "homepage": "https://github.com/tcurry-git/to-do-list.git",
   "name": "my-react-app",
   "private": true,
   "version": "0.0.0",
@@ -7,9 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "gh-pages": "^6.1.1",
     "prop-types": "^15.8.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

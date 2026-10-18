@@ -4,19 +4,16 @@ import { useAnnounce, useTooltip } from '../../context/index.js';
 import { Overlay } from '../global';
 import { Input, Button, BackToTop } from '../ui';
 import EmbeddedLinksSearchBar from './EmbeddedLinksSearchBar/EmbeddedLinksSearchBar.jsx';
+import { CompletedTaskIcon, AlarmClockIcon, PlusIcon, StarIcon, TrashIcon, NotificationIcon, ExclamationMarkIcon, ExpiredTaskIcon } from './local-icons';
 
 
-import { TbArrowBarToRight, TbEdit, TbExclamationMark, TbXFilled, TbSparkles } from 'react-icons/tb';
-import { StarIcon, TrashIcon, NotificationIcon }  from '../ui/icons/index.js';
-import { CompletedTaskIcon, AlarmClockIcon, PlusIcon } from './local-icons';
-
-
+import { TbArrowBarToRight, TbEdit, TbSparkles } from 'react-icons/tb';
 // if you have the same two components in an app you must useId to keep ids unique
 // use custom data attributes to select elements in JS so if you want to change a CSS class you won't have to change it in your JS
 // think about doing reminder and then get icons, disable setting a date before today and style!
 export default function ToDoList(){
     const setAnnouncementText = useAnnounce();
-    const [tooltipDetails, setTooltipDetails] = useTooltip(); 
+    const [, setTooltipDetails] = useTooltip(); 
     // helper function 
     function getRandomItemFromArr(arr){; 
         return arr[Math.floor(Math.random() * arr.length)];
@@ -64,9 +61,8 @@ export default function ToDoList(){
     }
     const initialTasks = generateinitialTasks(4);
     const id = useId();
-    const [reminderMsg, setReminderMsg] = useState(null);
     const [taskCards, setTaskCards] = useState(() => {
-        const savedTasks = localStorage.getItem('taskCards');
+        const savedTasks = localStorage.getItem('tasks');
         return savedTasks ? JSON.parse(savedTasks) : initialTasks
     }); 
     const [isOpen, setIsOpen] = useState(false);
@@ -78,9 +74,9 @@ export default function ToDoList(){
     if (taskCardsRef.current.length !== taskCards.length) {
         taskCardsRef.current = taskCards.map(() => React.createRef());
     }
-    const inputRef = useRef([]);
-    const myTooltip = tooltipDetails.find(tooltip => tooltip.id = inputRef.current[tooltipDetails.id])
     
+    const anyCardEditing = taskCards?.find(taskCard => taskCard?.isEditing);
+    const isSmallScreen = window.innerWidth <= 600;
     // RESET BY DEFAULT
     // useLayoutEffect(() => { // task hasn't actually been mapped when this runs, so have to wait until DOM finishes loading 
     //     if (!isEditing) return
@@ -100,25 +96,43 @@ export default function ToDoList(){
     //     return () => window.removeEventListener('mousedown', handleBounds)
     // }, [isEditing, taskCards]) // both change so must rely on both??
     // Inside TaskCard.jsx
+    
+    
     useEffect(() => {
-        localStorage.setItem('taskCards', JSON.stringify(taskCards));
+        // Force isEditing to false for storage so refreshes never trap the overlay
+        const sanitizedCards = taskCards.map(card => ({...card, isEditing: false})).
+        filter(card => card.task && card.deadline.date && card.deadline.time);
+        localStorage.setItem('tasks', JSON.stringify(sanitizedCards));
     }, [taskCards])
 
     useEffect(() => {
         //how does this work
+        const tmro = new Date()
+        tmro.setDate(tmro.getDate() + 1) 
+        tmro.setHours(0, 1, 0, 0);
+        const timeUntilReset = tmro.getTime() - Date.now();
+        
         taskCards.forEach(card => {
-            if (card.isLocked) return;
-            if (card.isCompleted && !taskTimerRef.current[card.id]){
+            if (!card.isLocked && card.isCompleted && !taskTimerRef.current[card.id]);
+            if (!card.isFavorited){
                 taskTimerRef.current[card.id] = setTimeout(() => {
-                    setTaskCards((prevCards) => prevCards.filter((c) => c.id !== card.id));
+                    setTaskCards((prevCards) => prevCards.filter((someCard) => someCard.id !== card.id));
                     delete taskTimerRef.current[card.id]; // taskID become key, timer id is the value
                 }, 8000);
-            }
-            if (!card.isCompleted && taskTimerRef.current[card.id]){
+
+            } else if(card.isFavorited){
+                taskTimerRef.current[card.id] = setTimeout(() => {
+                    setTaskCards((prevCards) => prevCards.map(someCard => someCard.id === card.id ? {...card, isCompleted: false} : someCard))
+                    delete taskTimerRef.current[card.id];
+                }, timeUntilReset)
+
+            } 
+            if (!card.isCompleted && taskTimerRef.current[card.id]){ // stop deletion if you accidentally click completed
                 clearTimeout(taskTimerRef.current[card.id]);
                 delete taskTimerRef.current[card.id];
             }
         })
+        return () => Object.values(taskTimerRef.current).forEach(timer => clearTimeout(timer)); // have to clear timeouts not just clear the ref (no point as well because they will be created again at some point)
     }, [taskCards]);
 
     useEffect(() => { 
@@ -127,49 +141,65 @@ export default function ToDoList(){
            handleReminders();
         }, SEC * 10) // 10sec
         return () => clearInterval(reminderInterval); // when would we ever unmount 
-    }, [reminderMsg]) // need this otherwise the useEffect will always have the null state value forever
+    }, [Notification.permission]) // if notifications aren't enabled on mount, the useEffect will never run!
 
-    useEffect(() => {
-        if (!reminderMsg) return;
-        const reminderTimer = setTimeout(() => {
-            setReminderMsg(null);
-        }, SEC * 10)
-        return () => clearTimeout(reminderTimer); // when it unmounts you clear timeout
-    }, [reminderMsg]) // code only runs if this value exists?
 
     function handleReminders(){
-        if (reminderMsg) return;
         const HALF_HOUR = HOUR / 2;
         const dateNow = Date.now();
-        let warningMsg = null;
         setTaskCards((t) => [...t].map((taskCard) => {
-            if (taskCard.isCompleted || !taskCard.remindersOn || taskCard.isLocked) return taskCard;
+            if (taskCard.isCompleted || taskCard.isLocked) return taskCard;
                 
                 const deadlineTime = getDeadlineTimestamp(taskCard.deadline);
                 const timeRemaining = deadlineTime - dateNow;
                 
-                if (timeRemaining <= HALF_HOUR && timeRemaining > 0 && !taskCard.hasReminded){
-                    warningMsg = `⏰ pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}!`;
+                if (timeRemaining <= HALF_HOUR && timeRemaining > 0  && taskCard?.remindersOn && !taskCard.hasReminded){
+                    console.log(Notification.permission);
+                    if (Notification.permission === 'granted') {
+                        const newNotif = new Notification('To Do List: Reminders', {
+                            body: `pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}`,
+                            tag: `warning-notif-${taskCard.id}`
+                        });
+                        if (newNotif){
+                            newNotif.onclick = () => {
+                                window?.focus();
+                                newNotif?.close()
+                            }  
+                        }
+                    } 
                     return {
                         ...taskCard, 
                         hasReminded: true
-                    } 
-                }
-                if(timeRemaining <= 0 && !taskCard.hasExpired) {
+                    }
+                };
+                
+                if(timeRemaining <= 0  && taskCard?.remindersOn && !taskCard.hasExpired) {
+                    console.log(`expired ${Notification.permission}`);
+                    if (Notification.permission === 'granted'){
+                        const newNotif = new Notification('To Do List: Reminders', {
+                            body: `task: ${taskCard.task} has now expired...`,
+                            tag: `expired-notif-${taskCard.id}`
+                        });
+                        if (newNotif){
+                            newNotif.onclick = () => {
+                                window?.focus();
+                                newNotif?.close()
+                            }
+                        }
+                    }
                     return {
                         ...taskCard,  
                         hasExpired: true, 
                     }
                 }
-                return taskCard; // default return for unhandled cases (say this condition: timeRemaining <= TEN_MINS && timeRemaining > 0 is met but this one:  !taskCard.hasReminded isnt)
+            return taskCard; // default return for unhandled cases (say this condition: timeRemaining <= TEN_MINS && timeRemaining > 0 is met but this one:  !taskCard.hasReminded isnt)
             })
         );
-        if (warningMsg) setReminderMsg(warningMsg);
     }
 
     function handleAddTask(){
         //max ten tasks
-        if (taskCards.length === 10) {
+        if (taskCards.length >= 50) {
             setTooltipDetails({
                 type: 'error', 
                 element: document.querySelector(`${styles.taskList}`),  
@@ -186,12 +216,11 @@ export default function ToDoList(){
             } ,
             isEditing: true,
             hasEdited: false,
-            remindersOn: true,
+            remindersOn: Boolean(Notification.permission === 'granted'),
             hasReminded: false,
             hasExpired: false,
             isFavorited: false,
             isCompleted: false, 
-            isDeleted: false,
             createdAt: Date.now()
         }
         setTaskCards((t) => [...t.filter((task) => !task.isLocked), newTaskCard]) // how does this work
@@ -201,7 +230,7 @@ export default function ToDoList(){
             date: '',
             time: '',
         }) // so on first edit w =e also copy over the task card
-        setAnnouncementText('task added')
+        setAnnouncementText(`task added. There are now ${taskCards.length} taskcards`)
     }
 
     function handleTaskCardDraftInput(inputType, draftValue){
@@ -209,7 +238,10 @@ export default function ToDoList(){
         setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, [inputType]: draftValue}));
     }
     function handleSaveChanges(id){
-        if (taskCardDraft?.taskID !== id || tooltipDetails) return; 
+        if (taskCardDraft?.taskID !== id || taskCardDraft?.task.length < 3 || 
+        taskCardDraft?.date.length !== 10 || taskCardDraft?.time.length !== 5){
+            return;
+        }
         setTaskCards((t) => t.map(taskCard => {
             if (taskCard.id !== id) return taskCard;
             return {
@@ -224,7 +256,7 @@ export default function ToDoList(){
                 }
         }));
         setTaskCardDraft(null);
-        setAnnouncementText('task changes successfully saved');
+        setAnnouncementText('task changes saved');
     }
 
     function focusNext(currInput) { 
@@ -250,10 +282,6 @@ export default function ToDoList(){
     //     } 
     // }
     function handleTaskValidation(task, inputElement, id){
-        if (!task) {
-            setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Task field cannot be empty'})
-            return;
-        }
         const trimmedTask = task.trim();
         const isLenLessThan50 = trimmedTask.length < 50;
         const isDuplicate = taskCards.some((taskCard) => (taskCard.id !== id && taskCard.task !== '') &&
@@ -285,7 +313,7 @@ export default function ToDoList(){
     
         if (dateDigits.length >= 2){
             if (!(day >= 1 && day <= 31)){
-                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Warning: task is too long, too short or already exists'});
+                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Warning: day must be in range 1-31'});
                 setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, date: ''}));
                 return;
             }
@@ -293,7 +321,7 @@ export default function ToDoList(){
     
         if (dateDigits.length >= 4){
             if (!(month >= 1 && month <= 12)){
-                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'months must be in range 1-12'});
+                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Warning: months must be in range 1-12'});
                 setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, date: taskCardDraft.date?.slice(0, 3) ?? ''}));
                 return;
             }
@@ -311,21 +339,13 @@ export default function ToDoList(){
                     return;
                 }
             } else { 
-                setTooltipDetails({id: id, type: 'error', element: inputElement, content: `the year must be ${currentYear} or ${currentYear + 1}`});
+                setTooltipDetails({id: id, type: 'error', element: inputElement, content: `Warning: the year must be ${currentYear} or ${currentYear + 1}`});
                 setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, date: taskCardDraft.date?.slice(0, 6) ?? ''}));
                 return;
             }
         } 
     }
-    function handleDateValidationOnBlur(date, inputElement, id){
-        // DATE
-        if (!date) {
-            setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Date field cannot be empty'});
-            return;
-        } else {
-            handleDateValidation(date, inputElement, id);
-        }
-    }
+
 
     function handleTimeValidation(date, time, inputElement, id){
     //TIME
@@ -336,7 +356,7 @@ export default function ToDoList(){
 
         if (timeDigits.length >= 2){
             if (!(hrs >= 0 && hrs <= 23)){
-                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'hours must be between 0-23'});
+                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Warning: hours must be between 0-23'});
                 setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, time: ''}));
                 return;
             } 
@@ -360,38 +380,29 @@ export default function ToDoList(){
                     }
                 }
             } else {
-                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'minutes must be between 0-59'});
-                setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, time: taskCardDraft.time?.slice(0, 3) ?? ''}));
+                setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Warning: minutes must be between 0-59'});
+                setTaskCardDraft((taskCardDraft) => ({...taskCardDraft, time: taskCardDraft.time?.slice(0, 2) ?? ''}));
                 return;
             }
         
         }        
     }
-    function handleTimeValidationOnBlur(date, time, inputElement, id){
-        if (!time){
-            setTooltipDetails({id: id, type: 'error', element: inputElement, content: 'Time field cannot be empty'});
-            return;
-        } else {
-            handleTimeValidation(date, time, inputElement, id);
-        }
-
-    }
+    
     function sortByDeadline(){
         setTaskCards((t) => [...t].sort((a, b) => getDeadlineTimestamp(a.deadline) - getDeadlineTimestamp(b.deadline))); 
         setAnnouncementText('task sorted by deadline (with task to be completed soonest at the top)');// we have to check date first then time
     }
     function handleCancelTask(id){
-        setTaskCards((t) => [...t].filter(taskCard => {
-            const idMatch = taskCard.id === id;
-            if (!idMatch) {
-                setAnnouncementText('task cancelled and has been deleted');
-                return taskCard;
+        const taskExists = taskCards.find(card => card.id === id && card.task && card.deadline.date && card.deadline.time);
+        setTaskCards((t) => {
+            if (!taskExists){
+                return [...t].filter(taskCard => taskCard.id !== id);
+            } else {
+                return [...t].map(taskCard => taskCard.id === id ? {...taskCard, isEditing: false} : taskCard);
             }
-            return taskCard.hasEdited;
-        }));
-        setTaskCards((t) => [...t].map(taskCard => taskCard.id === id ? {...taskCard, isEditing: false} : taskCard));
+        });
+        setAnnouncementText(taskExists ? 'task stopped editing' : `task cancelled and has been deleted. There are now ${taskCards.length - 1} taskcards left`)
         setTaskCardDraft(null);
-        setAnnouncementText('task stopped editing')
     }
     function handleStartEditing(id){ // reset logic
         const cardBeingEdited = taskCards.find(taskCard => taskCard.id === id && !taskCard.hasReminded);
@@ -409,18 +420,23 @@ export default function ToDoList(){
         setTaskCards((t) => [...t].map((taskCard) => taskCard.id === id ? {...taskCard, isEditing: true} : taskCard));
     }
     function handleSetReminders(id){
-        if (Notification.permission !== 'granted'){
-            Notification.requestPermission().then(perm => {
-                if (perm === 'granted'){
-                    setTaskCards((t) => [...t].map((taskCard) => taskCard.id === id ? {...taskCard, remindersOn: !taskCard.remindersOn} : taskCard));
-                    setAnnouncementText('task reminders on');
-                } else {
-                    alert('Need permission to send browser notifications if you want to be sent reminders');
-                }
-            });
-        } else if (Notification.permission === 'granted') {
+        const err = () => alert('Need permission to send browser notifications if you want to be sent reminders');
+        const ifGranted = () => {
             setTaskCards((t) => [...t].map((taskCard) => taskCard.id === id ? {...taskCard, remindersOn: !taskCard.remindersOn} : taskCard));
             setAnnouncementText('task reminders on');
+        }
+        if (Notification.permission === 'granted'){
+            ifGranted();
+        } else if (Notification.permission === 'denied') {
+            err();
+        } else {
+            Notification.requestPermission().then(perm => {
+                if (perm === 'granted'){
+                    ifGranted()
+                } else {
+                    err();
+                }
+            });
         }
     }
     function handleCompletedTask(id){
@@ -444,26 +460,21 @@ export default function ToDoList(){
         setTaskCards((t) => [...t].filter((taskCard) => taskCard.isFavorited && !initialTasks));
         setAnnouncementText('all tasks deleted');
     }
-    const isEditingGeneral = taskCards.some(taskCard => taskCard?.isEditing)
-    const isSmallScreen = window.innerWidth <= 600;
-    const isAllInputsValid = taskCardDraft?.task.length >=3 && taskCardDraft?.deadline?.date.length === 10 && taskCardDraft?.deadline?.time.length === 5;
+    const containerRef = useRef(null);
     return(
         <>
-        <article data-to-do-list-container className={styles.toDoList}>
-        {isEditingGeneral && <Overlay container={document.querySelector('[data-to-do-list-container]')} color='#000000a6'/>}
-        {isOpen && <Overlay container={document.querySelector('[data-to-do-list-container]')} color='transparent' />}
-        {/* <BackgroundIcons/> */}
-        {reminderMsg?.activeMsg && <div role='status' tabIndex={-1} className={styles.reminderTaskActive}>{reminderMsg?.activeMsg}</div>} 
-        {reminderMsg?.expiredMsg && <div role='status' tabIndex={-1} className={styles.reminderTaskExpired}>{reminderMsg?.expiredMsg}</div>} 
+        <article ref={containerRef} data-to-do-list-container className={styles.toDoList}>
+        {anyCardEditing && <Overlay container={containerRef.current}/>}
+        {isOpen && <Overlay container={containerRef.current} color='transparent' />} 
         {/* user can click outside of the taskCard region stop editing as well - window event listener in useEffect? */}
             <div className={styles.toDoListContainer}>
                 <div className='container'>
-                    <main className={isSmallScreen ? 'content-container' : ''}>
-                        <section inert={isEditingGeneral ? true : undefined} className={`${styles.addNewTaskContainer}`}> {/*correct use of BEM?*/}
-                            <button type='button' autoFocus className={`button text-md ${styles.addTaskBtn}`} onClick={() => handleAddTask()}><PlusIcon strokeWidth={2.6}/>Add New Task</button> {/*is aria-label correct here*/}
+                    <main className={isSmallScreen ? 'content-container' : undefined}>
+                        <section inert={anyCardEditing} className={`${styles.addNewTaskContainer}`}> {/*correct use of BEM?*/}
+                            <Button autoFocus={!isSmallScreen} className={`button text-md ${styles.addTaskBtn}`} onClick={() => handleAddTask()}><PlusIcon strokeWidth={2.6}/>Add New Task</Button> {/*is aria-label correct here*/}
                         </section>
                         <section>
-                            <div data-task-manip-widgs inert={isEditingGeneral ? true : undefined} className={styles.taskManipulationWidgets}>
+                            <div data-task-manip-widgs inert={anyCardEditing} className={styles.taskManipulationWidgets}>
                                 <div className={styles.taskSearchBar}>
                                     <EmbeddedLinksSearchBar 
                                     itemsToSearchThrough={taskCards}
@@ -474,16 +485,16 @@ export default function ToDoList(){
                                 </div>
                                 <div className={`${styles.sliderContainer} ${isOpen ? styles.sliderOpen : ''}`}>
                                     <div className={styles.actionBtnsContainer} >
-                                        {isSmallScreen && (
-                                        <button type='button' className={styles.actionBtnsController}
+                                        {isSmallScreen && !anyCardEditing && (
+                                        <Button className={styles.actionBtnsController}
                                         aria-label='Click or drag for more options' aria-controls={`${id}-actionBtns`} aria-expanded={isOpen} 
                                         onClick={() => {isOpen ? setIsOpen(false) : setIsOpen(true)}}>
                                             <TbSparkles aria-hidden='true' color='purple' />
-                                        </button>)}
+                                        </Button>)}
                                         <ul className={styles.actionBtns} id={`${id}-actionBtns`}>
-                                            <li><button type='button' className={`button ${styles.filterBtn}`} onClick={() => sortByDeadline()} aria-label='Sort tasks by deadline'><AlarmClockIcon/>sort</button></li>
-                                            <li><button type='button' className={`button ${styles.unfavoriteAllBtn}`} onClick={() => handleUnfavoriteAllTasks()} aria-label='Unfavorite all tasks'><StarIcon fill="var(--clr-gold)"/><TbArrowBarToRight aria-hidden={true}/><StarIcon/></button></li>
-                                            <li><button type='button' className={`button ${styles.deleteAllBtn}`} onClick={() => handleDeleteAllTasks()} aria-label='Delete all tasks'><TrashIcon/>all</button></li>
+                                            <li><Button className={`button ${styles.filterBtn}`} onClick={() => sortByDeadline()} aria-label='Sort tasks by deadline'><AlarmClockIcon/>sort</Button></li>
+                                            <li><Button className={`button ${styles.unfavoriteAllBtn}`} onClick={() => handleUnfavoriteAllTasks()} aria-label='Unfavorite all tasks'><StarIcon fill="var(--clr-yellow)"/><TbArrowBarToRight aria-hidden={true}/><StarIcon/></Button></li>
+                                            <li><Button className={`button ${styles.deleteAllBtn}`} onClick={() => handleDeleteAllTasks()} aria-label='Delete all tasks'><TrashIcon/>all</Button></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -496,27 +507,30 @@ export default function ToDoList(){
                                     const isEditingSpecificTaskCard = (taskCard.id === taskCardDraft?.taskID) && taskCard?.isEditing 
                                     return (
                                     <li key={taskCard.id} id={taskCard.id} ref={taskCardsRef.current[index]} tabIndex={0}
-                                    className={[styles.taskCard, taskCard.isCompleted && !taskCard.isLocked && styles.taskCompleted, 
-                                                taskCard.hasReminded && !taskCard.isLocked && styles.taskWarning,
-                                                taskCard.hasExpired && !taskCard.isLocked && styles.taskExpired, 
-                                                isEditingSpecificTaskCard && styles.taskCardEditing].filter(Boolean).join(' ')}>
+                                        className={[styles.taskCard, 
+                                            taskCard.isCompleted && !taskCard.isLocked && !taskCard.isFavorited && `${styles.taskCompleted} ${styles.fadeOut}`,
+                                            taskCard.isCompleted && !taskCard.isLocked && taskCard.isFavorited && styles.taskCompleted,
+                                            taskCard.hasReminded && !taskCard.isLocked && styles.taskWarning,
+                                            taskCard.hasExpired && !taskCard.isLocked && styles.taskExpired, 
+                                            isEditingSpecificTaskCard && styles.taskCardEditing].filter(Boolean).join(' ')}
+                                        >
                                         {(isEditingSpecificTaskCard) && (
                                             <div data-edit-btns className={styles.editingActionBtns} aria-live='polite'>
-                                                <button data-save-changes type='button' className={`button ${styles.saveChangesBtn}`} disabled={!isAllInputsValid} tabIndex={0} onClick={() => handleSaveChanges(taskCard.id)}>Save</button>
-                                                <button type='button' className={`button ${styles.cancelEditBtn}`} tabIndex={0} onClick={() => handleCancelTask(taskCard.id)}>Cancel</button>
-                                                {isEditingSpecificTaskCard && taskCard.hasEdited && (<button type='button' className={`button ${styles.resetEditBtn}`} tabIndex={0} onClick={() => handleStartEditing(taskCard.id)}>Reset</button>)}
+                                                <Button data-save-changes className={`button ${styles.saveChangesBtn}`} tabIndex={0} onClick={() => handleSaveChanges(taskCard.id)}>Save</Button>
+                                                <Button className={`button ${styles.cancelEditBtn}`} tabIndex={0} onClick={() => handleCancelTask(taskCard.id)}>Cancel</Button>
+                                                {isEditingSpecificTaskCard && taskCard.hasEdited && (<Button className={`button ${styles.resetEditBtn}`} tabIndex={0} onClick={() => handleStartEditing(taskCard.id)}>Reset</Button>)}
                                             </div>)}
                                         {taskCard.hasReminded && (
                                             <span className={styles.taskWarningWidget} role='alert' aria-label={`${taskCard.task} marked as expiring soon`}>
-                                                <TbExclamationMark aria-hidden='true' size='var(--icon-md)' color='orangered' strokeWidth={3}/>
+                                                <ExclamationMarkIcon/>
                                             </span>)}
                                         {taskCard.hasExpired && (
                                             <span className={styles.taskExpiredWidget} role='alert' aria-label={`${taskCard.task} marked as expiring soon`}>
-                                                <TbXFilled aria-hidden='true' size='var(--icon-md)' color='var(--clr-red)'/>
+                                                <ExpiredTaskIcon/>
                                             </span>)}
                                         <div data-taskcard-inputs className={styles.taskInputs}>
                                             <div data-tooltip-container>
-                                                <Input autoFocus={isEditingSpecificTaskCard} className={`text-sm ${styles.task}`} aria-label='Enter task' readOnly={!isEditingSpecificTaskCard} 
+                                                <Input autoFocus={isEditingSpecificTaskCard} className={`text-sm ${styles.task}`} aria-label='Enter task' inert={!isEditingSpecificTaskCard} 
                                                 value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).task : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.task : taskCard.task} // was taskTitle
                                                 onChange={(e, inputId) => {
                                                     const taskFormatted = e.target.value.replace(/[^a-zA-Z\s]/g, "");
@@ -525,13 +539,12 @@ export default function ToDoList(){
                                                 onKeyDown={(e, inputId) => { if (e.key === "Enter") {
                                                     e.preventDefault(); // stops focus of next input from triggering onBlur
                                                     handleTaskValidation(e.target.value, e.target, inputId)}}}
-                                                onBlur={(e, inputId) => handleTaskValidation(e.target.value, e.target, inputId)}
                                                 placeholder='Start typing task...' maxLength={50}/>
                                             </div>
                                             <div className={styles.taskDeadline}>
-                                                <span className={styles.deadlineTitle}><strong>Deadline: &nbsp;</strong></span>
+                                                <span className={styles.deadlineTitle}><strong>Deadline: </strong></span>
                                                 <div data-tooltip-container className={styles.deadlineDate}>
-                                                    <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} readOnly={!isEditingSpecificTaskCard} aria-label="Enter date of deadline in DDMMYYYY format" 
+                                                    <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} inert={!isEditingSpecificTaskCard} aria-label="Enter date of deadline in DDMMYYYY format" 
                                                     value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).deadline.date : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.date : taskCard.deadline.date} 
                                                     onKeyDown={(e) => (e.key === "Backspace" && e.target.value.trim() === '') && focusLast(e.target)}
                                                     onChange={(e, inputId) => {
@@ -539,25 +552,25 @@ export default function ToDoList(){
                                                         handleTaskCardDraftInput('date', dateFormatted)
                                                         handleDateValidation(e.target.value, e.target, inputId)
                                                     }}
-                                                    onBlur={(e, inputId) => handleDateValidationOnBlur(e.target.value, e.target, inputId)}
+                                                    // onBlur={(e, inputId) => handleDateValidationOnBlur(e.target.value, e.target, inputId)}
                                                     placeholder={currDateDDMMYYYYFormat} maxLength={10}/>
                                                 </div>
                                                 <div data-tooltip-container className={styles.deadlineTime}>
-                                                    <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} readOnly={!isEditingSpecificTaskCard} aria-label="Enter time of deadline in HHMM format"                                                 
+                                                    <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} inert={!isEditingSpecificTaskCard} aria-label="Enter time of deadline in HHMM format"                                                 
                                                     value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).deadline.time : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.time : taskCard.deadline.time} 
                                                     onKeyDown={(e) => (e.key === "Backspace" && e.target.value.trim() === '') && focusLast(e.target)}
                                                     onChange={(e, inputId) => {
                                                         const timeFormatted = handleTimeFormat(e.target.value);
                                                         const currTaskCard = taskCards.find(card => card.id === taskCard.id);
-                                                        const dateToUse = (taskCardDraft.taskID === taskCard.id && taskCardDraft?.date !== null)
-                                                                             ? taskCardDraft.date : currTaskCard.deadline.date;
+                                                        const dateToUse = (taskCardDraft?.taskID === taskCard.id && taskCardDraft?.date !== null)
+                                                                             ? taskCardDraft?.date : currTaskCard?.deadline.date;
                                                         handleTaskCardDraftInput('time', timeFormatted)
                                                         handleTimeValidation(dateToUse, e.target.value, e.target, inputId)}}                                     
                                                     onBlur={(e, inputId) => {
                                                         const currTaskCard = taskCards.find(card => card.id === taskCard.id);
-                                                        const dateToUse = (taskCardDraft.taskID === taskCard.id && taskCardDraft?.date !== null)
-                                                                             ? taskCardDraft.date : currTaskCard.deadline.date;
-                                                        handleTimeValidationOnBlur(dateToUse, e.target.value, e.target, inputId)
+                                                        const dateToUse = (taskCardDraft?.taskID === taskCard.id && taskCardDraft?.date !== null)
+                                                                             ? taskCardDraft?.date : currTaskCard?.deadline.date;
+                                                        // handleTimeValidationOnBlur(dateToUse, e.target.value, e.target, inputId)
                                                     }}
                                                     placeholder={currTimeHHMMFormat} maxLength={5}/>
                                                 </div>
@@ -566,15 +579,15 @@ export default function ToDoList(){
                                         </div>
                                         <div className={styles.taskBtns}>
                                             <div className={styles.taskOperationalBtns}>
-                                                <button type='button' tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && !taskCard.hasExpired && handleEditing(taskCard.id)} aria-label='Edit task card'><TbEdit size='var(--icon-md)' aria-hidden={true}/></button>
-                                                <button type='button' tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && !taskCard.hasExpired && handleSetReminders(taskCard.id)} aria-label='Toggle task reminder'><NotificationIcon remindersOn={taskCard.remindersOn}/></button>
+                                                <Button inert={taskCard.hasExpired} tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && handleEditing(taskCard.id)} aria-label='Edit task card'><TbEdit size='var(--icon-md)' aria-hidden={true}/></Button>
+                                                <Button inert={taskCard.hasExpired} tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && handleSetReminders(taskCard.id)} aria-label='Toggle task reminder'><NotificationIcon remindersOn={taskCard.remindersOn}/></Button>
                                             </div>
                                             <div className={styles.taskActionBtns}>
                                                 <ul className={styles.taskActionBtnsList}>
                                                     {/* task.isFavorited evaluates to true/false and then the star component itself handles the styling difference*/}
-                                                    <li><button type='button' tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && !taskCard.hasExpired && handleFavoriteTask(taskCard.id)} aria-label='Toggle favorite task'><StarIcon isFavorited={taskCard.isFavorited}/></button></li>
-                                                    <li><button type='button' tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={(e) => !isEditingSpecificTaskCard && !taskCard.hasExpired && handleCompletedTask(taskCard.id)} aria-label='Toggle mark as completed'><CompletedTaskIcon isCompleted={taskCard.isCompleted}/></button></li>
-                                                    <li><button type='button' tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && handleDeletedTask(taskCard.id)} aria-label='Delete task'><TrashIcon/></button></li>
+                                                    <li><Button inert={taskCard.hasExpired} tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && handleFavoriteTask(taskCard.id)} aria-label='Toggle favorite task'><StarIcon isFavorited={taskCard.isFavorited}/></Button></li>
+                                                    <li><Button inert={taskCard.hasExpired} tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={(e) => !isEditingSpecificTaskCard && handleCompletedTask(taskCard.id)} aria-label='Toggle mark as completed'><CompletedTaskIcon isCompleted={taskCard.isCompleted}/></Button></li>
+                                                    <li><Button tabIndex={isEditingSpecificTaskCard ? -1 : 0} onClick={() => !isEditingSpecificTaskCard && handleDeletedTask(taskCard.id)} aria-label='Delete task'><TrashIcon/></Button></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -585,7 +598,7 @@ export default function ToDoList(){
                     </main>
                 </div>
             </div>
-        <BackToTop/>
+        <BackToTop inert={anyCardEditing}/>
         </article>
         </>
     )

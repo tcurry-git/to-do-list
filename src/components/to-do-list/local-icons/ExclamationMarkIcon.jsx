@@ -1,8 +1,8 @@
 import { TbExclamationMark } from "react-icons/tb";
-import { CustomBaseIcon } from "../../ui/icons/CustomBaseIcon";
+import { CustomBaseIcon } from './../../ui';
 
 export function ExclamationMarkIcon({
-    color, 
+    color = 'orangered', 
     size,
     strokeWidth = 3,
     ...props

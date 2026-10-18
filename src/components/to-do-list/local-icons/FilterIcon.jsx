@@ -1,5 +1,5 @@
 import { TbFilter2 } from "react-icons/tb";
-import { CustomBaseIcon } from "./CustomBaseIcon";
+import { CustomBaseIcon } from './../../ui';
 
 export function FilterIcon(
     {

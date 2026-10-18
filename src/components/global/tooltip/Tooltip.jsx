@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom';
 import styles from './Tooltip.module.css';
 import { useEffect } from 'react';
+
 export function Tooltip({
     container,
     id,
@@ -31,11 +32,11 @@ export function Tooltip({
 
     if (!container || !id || !type || !content) return;
 
-    const isErrorTooltip = type.contains('error');
+    const isErrorTooltip = type.includes('error');
     const fontColor = isErrorTooltip ? 'var(--clr-red)' : 'black';
  
-    return !isErrorTooltip && ReactDOM.createPortal(
-        <div data-tooltip id={id} styles={styles.tooltip} aria-live={isErrorTooltip ? 'assertive' : 'polite'} aria-atomic='true' aria-relevant='all' style={{color: `${fontColor}`}} {...props}>{content}</div>,
+    return ReactDOM.createPortal(
+        <div data-tooltip id={id} className='tooltip text-3xs' aria-live={isErrorTooltip ? 'assertive' : 'polite'} aria-atomic='true' aria-relevant='all' style={{color: `${fontColor}`}} {...props}>{content}</div>,
         container
     )
 }

@@ -1,9 +1,10 @@
 import { useId } from 'react';
 import { useTooltip } from '../../../context';
-import styles from './Input.module.css';
+
 export function Input({
     type = "text",
     label, 
+    className,
     onChange,
     onBlur,
     onKeyDown,
@@ -13,13 +14,13 @@ export function Input({
     const inputId = props?.id ?? generatedId;
     const [tooltipDetails, ] = useTooltip();
 
-    const myTooltip = tooltipDetails.find(tooltip => tooltip.id?.contains(inputId));
+    const myTooltip = tooltipDetails.find(tooltip => tooltip.id?.includes(inputId));
 
     return(
         <>
         <input 
         id={inputId}
-        className={styles.input} 
+        className={className} 
         type={type} 
         aria-invalid={Boolean(myTooltip)} 
         aria-errormessage={myTooltip?.id} 

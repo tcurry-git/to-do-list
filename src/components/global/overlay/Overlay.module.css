@@ -5,6 +5,5 @@
     inset: 0;
     -webkit-user-select: none;
     user-select: none;
-    pointer-events: none;
     z-index: 999;
 }

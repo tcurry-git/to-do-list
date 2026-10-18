@@ -1,5 +1,5 @@
 import { TbChecklist } from "react-icons/tb";
-import { CustomBaseIcon } from "../../ui/icons/CustomBaseIcon";
+import { CustomBaseIcon } from './../../ui';
 
 export function CompletedTaskIcon(
     // these are props, they dont need to be svg attributes

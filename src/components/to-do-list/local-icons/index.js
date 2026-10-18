@@ -1,4 +1,9 @@
-export * from './CompletedTaskIcon';
-export * from './AlarmClockIcon';
-export * from './PlusIcon';
-export * from './ExclamationMarkIcon';
+export { CompletedTaskIcon } from './CompletedTaskIcon';
+export { AlarmClockIcon } from './AlarmClockIcon';
+export { PlusIcon } from './PlusIcon';
+export { FilterIcon } from './FilterIcon';
+export { NotificationIcon } from './NotificationIcon';
+export { StarIcon } from './StarIcon';
+export { TrashIcon } from './TrashIcon';
+export { ExclamationMarkIcon } from './ExclamationMarkIcon';
+export { ExpiredTaskIcon } from './ExpiredTaskIcon';

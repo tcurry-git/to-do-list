@@ -1,5 +1,5 @@
 import { TbStarFilled } from "react-icons/tb";
-import { CustomBaseIcon } from "./CustomBaseIcon";
+import { CustomBaseIcon } from "./../../ui";
 
 export function StarIcon(
     {
@@ -10,7 +10,7 @@ export function StarIcon(
         ...props
     }
 ){
-    const defaultFill = fill ?? (isFavorited ? "var(--clr-gold)" : "none"); // if fill is null use default style
+    const defaultFill = fill ?? (isFavorited ? "var(--clr-yellow)" : "none"); // if fill is null use default style
     return (
         <CustomBaseIcon 
         icon={TbStarFilled} 

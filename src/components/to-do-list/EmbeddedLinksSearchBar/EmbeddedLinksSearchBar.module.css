@@ -1,7 +1,7 @@
 :is(.searchBtn, .clearSearchQueryBtn){
     transform: none !important;
 }
-:where(.searchBtn, .clearSearchQueryBtn, .searchOpt):is(:focus-visible, :hover){
+:where(.searchBtn, .clearSearchQueryBtn):is(:focus-visible, :hover){
     background-color: var(--clr-surface-muted);
 }
 .searchBar{
@@ -17,17 +17,14 @@
         border-left: 2px solid var(--clr-default-border);
         border-top-right-radius: inherit;
         border-bottom-right-radius: inherit;
-        &:focus-visible{
-            z-index: 1;
-        }
     }
 }
 .searchBox{
+    position: relative;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
 }
 .search{
     width: 100%;
@@ -36,19 +33,22 @@
     border-bottom-left-radius: var(--radius-full);
 }
 .clearSearchQueryBtn{
-    width: var(--icon-sm);
+    position: absolute;
+    width: var(--icon-md);
+    right: 0;
     margin-inline-end: var(--space-2xs);
-    padding: var(--space-5xs);
+    padding: var(--space-4xs);
     border-radius: var(--radius-full);
 }
 .searchItems{
     width: 100%;
     position: absolute;
-    top: calc(100% + 5px);
+    top: calc(100% + 6px);
     display: grid;
     background-color: white;
     border-radius: var(--radius-lg);
-    z-index: 1;
+    box-shadow: 0 2px 10px var(--clr-soft-lightblue);
+    z-index: 999;
     & > :not(:last-child){
         border-bottom: 1px solid var(--clr-default-border);
     }
@@ -67,10 +67,5 @@
         align-items: center;
         gap: var(--space-xs);
         padding: var(--space-2xs) var(--space-2xs);
-        &.searchOptSelected{
-            background-color: var(--clr-surface-muted);
-            outline: 2px solid black;
-            z-index: 1;
-        }
     }
 }

@@ -1,19 +1,20 @@
 import styles from './EmbeddedLinksSearchBar.module.css';
 import { useState, useRef, useId } from 'react';
-import { SearchIcon } from '../../ui/icons';
 import { useAnnounce, useTooltip } from '../../../context';
-import { Input } from '../../ui';
-import { TbXFilled } from 'react-icons/tb';
+import { SearchIcon, ClearSearchIcon } from './local-icons';
+import { Input, Button } from '../../ui';
 
 //IMPORTANT PATTERN TO REMEMBER
 // 1. pointerdown / touchstart / mousedown
 // 2. Focus Shift: The <input> loses focus, triggering its **onBlur** event. // click never fires to search list closes before click registers so I never get sent to task
 // 3. pointerup / touchend / mouseup
 // 4. click event (fires only after both press and release complete)
-export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSearch, paddingNearby, listItemShadow }) { // in this case we are searching the tasks of the taskCards
+export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNearby }) { // in this case we are searching the tasks of the taskCards
     // custom hooks
-    const [, setTooltipDetails] = useTooltip(null);
+    const [, setTooltip] = useTooltip(null);
     const setAnnouncerText = useAnnounce();
+
+    const id = useId(); // this component might be used more than once in my app
 
     const [searchQuery, setSearchQuery] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -21,12 +22,10 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
     const [focusedID, setFocusedID] = useState(null);
 
     const searchInputRef = useRef(null);
-    const searchListRef = useRef(null);
-
-    const id = useId(); // this component might be used more than once in my app
 
     const tasksWithIdArr = itemsToSearchThrough.map(item => ({id: item.id, task: item.task}));
-    const searchQueryErrMsg = 'Task not found. Try to be more specific with the search you typed in or select a task from the list'
+    const searchQueryErrMsg = 'Warning: task not found - try to be more specific'
+    const announcerMsg = 'Selected task is now in view and focused';
 
     function reset(){
         setSearchQuery('');
@@ -35,19 +34,22 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
         setFocusedID(null); // no point having that if its closed
     }
 
-    function handleSearchQueryOnEnter(searchInput, id){
-        const canWeFindMatch = tasksWithIdArr.find(item => item.task.replace(/\s/g, '').toLowerCase().includes(searchQuery.toLowerCase().replace(/\s/g, '').trim())); // returns the specific object where this is the the case?
+    function handleSearchQueryOnEnter(searchInput, searchVal, id){
+        if (!searchVal || !searchInput || !id) return;
+        const canWeFindMatch = tasksWithIdArr.find(item => {
+            return item.task.replace(/\s/g, '').toLowerCase().includes(searchVal.toLowerCase().replace(/\s/g, '').trim()); 
+        });
         if (canWeFindMatch) {
             for (const item of itemsToSearchThrough){
                 if (item.id === canWeFindMatch.id){
                     const taskCardDOMNode = document.getElementById(item.id);
                     taskCardDOMNode.scrollIntoView({ behavior: 'smooth' });
                     taskCardDOMNode.focus(); // we are focusing on an object not the actual dom node...
-                    setAnnouncerText('Selected task is now in view and focused')
+                    setAnnouncerText(announcerMsg)
                 } 
             } 
         } else {
-            setTooltipDetails({id: id, type: 'error', element: searchInput, content: searchQueryErrMsg});
+            setTooltip({id: id, type: 'error', element: searchInput, content: searchQueryErrMsg});
         }
     }
     
@@ -91,13 +93,23 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
             const currElementFocused = e.relatedTarget;
             if (!(parent.contains(currElementFocused))) reset();
         }}>
-            <div className={styles.searchBox}>
-                <Input role='combobox' data-input-container className={styles.search} style={{padding: `${paddingNearby} var(--space-xs)`}} ref={searchInputRef} type="text" id={`${id}-searchInput`} value={searchQueryFromList || searchQuery} 
+            <div className={styles.searchBox} data-tooltip-container>
+                <Input role='combobox' id={`${id}-searchInput`} ref={searchInputRef} className={styles.search} style={{padding: `${paddingNearby} var(--space-xs)`}} value={searchQueryFromList || searchQuery} 
                 aria-label='Search for task' aria-autocomplete='list' aria-controls={`${id}-searchItems`} aria-expanded={Boolean(filtered.length > 0)}
                 aria-activedescendant={focusedID ? `${focusedID}-opt` : undefined}
                 onChange={(e) => setSearchQuery(e.target.value.replace(/[^a-zA-Z\s]/g, ''))}
-                onKeyDown={(e, inputId) => {
-                    if (e.key === "Enter") handleSearchQueryOnEnter(e.currentTarget, inputId)
+                onKeyDown={(e) => {
+                    if (e.key === "Enter"){
+                        e.preventDefault(); 
+                        if (focusedID){
+                            const elementToGoTo = document.getElementById(focusedID);
+                            elementToGoTo?.scrollIntoView();
+                            elementToGoTo?.focus();
+                            reset();
+                        } else {
+                            handleSearchQueryOnEnter(e.target, e.target.value, e.target.id)
+                        }
+                    } 
                     if (e.key === "Escape") reset();
                     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                         e.preventDefault();
@@ -106,8 +118,9 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
                 }}
                 autoComplete='off' spellCheck='false'
                 placeholder='Search for task..'/>
+                {searchQuery && <Button className={styles.clearSearchQueryBtn} aria-label='Clear search query' onClick={() => { setSearchQuery(''), searchInputRef.current?.focus()} }><ClearSearchIcon/></Button>}
                 {searchQuery && isOpen && filtered.length > 0 && ( 
-                    <div data-embedded-links-searchbar-opt-cont id={`${id}-searchItems`} className={styles.searchItems} ref={searchListRef} style={{boxShadow: listItemShadow}} role='listbox' aria-label='Searched items' >
+                    <div data-embedded-links-searchbar-opt-cont id={`${id}-searchItems`} className={styles.searchItems} role='listbox' >
                         {filtered.map((filItem) => {
                             const isSelected = focusedID === filItem.id; // creates an illusion on focus navigation because its triggering a class which looks like the searchOpt is receiving focus
                             const optID = `${filItem.id}-opt`;
@@ -119,16 +132,8 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
                                     const elementToGoTo = document.getElementById(filItem.id);
                                     elementToGoTo?.scrollIntoView();
                                     elementToGoTo?.focus();
+                                    setAnnouncerText(announcerMsg);
                                     reset();
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter"){
-                                        e.preventDefault();
-                                        const elementToGoTo = document.getElementById(filItem.id);
-                                        elementToGoTo?.scrollIntoView();
-                                        elementToGoTo?.focus();
-                                        reset();
-                                    }
                                 }}>
                                     <SearchIcon color='black' size='var(--icon-sm)'/>
                                     <p>{filItem.task}</p>
@@ -137,12 +142,15 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, whatToSea
                         })}
                     </div>
                 )}
-                {searchQuery && <button type='button' className={styles.clearSearchQueryBtn} aria-label='Clear search query' onClick={() => { setSearchQuery(''), searchInputRef.current?.focus()} }><TbXFilled/></button>}
             </div>
-            <button type='button' className={styles.searchBtn} aria-label='Click to search' 
-            onClick={ (e) => handleSearchQueryOnEnter(e.currentTarget.closest('input')) }>
+            <Button className={styles.searchBtn} aria-label='Click to search' 
+            onMouseDown={(e) => e.preventDefault()} // 
+            onClick={() => {
+                const inputNode = searchInputRef?.current;
+                handleSearchQueryOnEnter(inputNode, inputNode?.value, inputNode?.id)
+            }}>
                 <SearchIcon/>
-            </button>
+            </Button>
         </div>
         </>
     );

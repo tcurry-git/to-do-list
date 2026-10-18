@@ -1,6 +1,5 @@
-
+import { CustomBaseIcon } from './../../../ui';
 import { TbSearch } from 'react-icons/tb';
-import { CustomBaseIcon } from './CustomBaseIcon';
 
 export function SearchIcon(
     {
@@ -8,5 +7,5 @@ export function SearchIcon(
         ...props
     }
 ){
-    return <CustomBaseIcon icon={TbSearch} color={color} {...props} />   ;
+    return <CustomBaseIcon icon={TbSearch} color={color} {...props} /> ;
 }

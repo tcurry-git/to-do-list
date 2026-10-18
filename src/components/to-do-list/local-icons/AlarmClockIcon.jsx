@@ -1,5 +1,5 @@
 import { TbClock } from 'react-icons/tb';
-import { CustomBaseIcon } from '../../ui/icons/CustomBaseIcon';
+import { CustomBaseIcon } from './../../ui';
 
 export function AlarmClockIcon({
     size = 'var(--icon-md)',

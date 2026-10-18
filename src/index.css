@@ -25,11 +25,13 @@ html{
   --clr-surface-muted: hsl(0, 0%, 95%); 
   --clr-default-hover: lightgrey; 
   --clr-default-border: hsl(0, 10%, 90%);             
-  --clr-default-shadow: hsl(0, 6%, 66%);             
+  --clr-default-shadow: hsl(0, 6%, 66%);  
+  --clr-dark-shadow: color-mix(in srgb, var(--clr-default-shadow) 85%, black 15%);        
   --clr-lightblue: hsl(201, 100%, 67%); /* generally for buttons */  
   --clr-active-link: black;  
   --clr-inline-link-unvisited: hsl(225, 100%, 58%);
-  --clr-gold: rgb(251, 251, 37); 
+  --clr-yellow: rgb(251, 237, 37);
+  --clr-gold:  rgb(245, 210, 32);
   --clr-red: hsl(0, 100%, 50%);
   --clr-lightred: hsl(0, 100%, 79%);
   --clr-green: hsl(128, 88%, 38%);
@@ -37,6 +39,7 @@ html{
   --clr-lightgreen: hsl(120, 98%, 82%);
   --clr-valid-input: hsl(120, 67%, 53%);
   --clr-invalid-input: hsl(0, 65%, 51%);
+  --clr-overlay: rgba(0, 0, 0, 0.6);
   /* TYPOGRAPHY - FONT SIZES */
   --fs-base: clamp(1rem, calc(3rem - 5vw), 1.05rem);
   --fs-3xs: 0.75rem; /* for even smaller details */
@@ -107,9 +110,9 @@ html{
     --clr-secondary: var(--clr-secondary-dt);
   }
 }
-video:picture-in-picture{ /* selects video thats currently in picture in picture mode*/
-    /* do something */
-}
+/* video:picture-in-picture{ /* selects video thats currently in picture in picture mode*/
+    /* do something * /
+} */
 body{
   font-family: Arial, Helvetica, sans-serif;
   font-size: var(--fs-base);
@@ -126,11 +129,13 @@ body{
 /* Apply globally to all focusable elements*/
 body.user-is-tabbing :is(a, button, select, textarea, input, summary, [tabindex]):focus-visible {
   position: relative;  
-  outline: 2px solid currentColor;
+  outline: 2px dashed currentColor;
   outline-offset: 2px;
-  outline-style: dashed;
   z-index: 1;           
-} 
+}
+*:is(:focus){
+  box-shadow: none;
+}
 /* Apply text-box trimming strictly to typography tags */
 /* h1, h2, h3, h4, h5, h6, p, li, span, button, label {
    text-box: trim-both cap alphabetic; /* this is for the text to be aligned with the top of the box, but it doesn't work in firefox * /
@@ -238,20 +243,21 @@ input, button, textarea, select {
   font-weight: normal;
 } */
 input{
-  max-width: max-content;
+  width: 100%;
   padding: var(--space-xs) var(--space-xs) ;
   border: 2px solid transparent;
-  /* max-width: max-content; */
+  background-color: transparent;
 }
-input[disabled="true"]{
-  background-color: grey;
+input[role="combobox"]:focus{
+  outline: none;
 }
+/* 
 input[aria-invalid="false"]{
   border-color: var(--clr-valid-input);
 }
 input[aria-invalid="true"]{
   border-color:var(--clr-invalid-input);
-}
+} */
 .input-container{ 
   position: relative;
   & label{
@@ -288,11 +294,62 @@ input[aria-invalid="true"]{
   gap: var(--space-4xs);
   cursor: pointer;
 }
+input[disabled='true']{
+  background-color: color-mix(in srgb, currentColor 70%, black 30%);
+}
+[aria-selected="true"]{
+    background-color: var(--clr-surface-muted);  
+    outline: 2px solid;
+    z-index: 1;        
+}
 /* ERR MESSAGE POPUPS */
-:is([data-tooltip-container]){
+:is([data-tooltip-container="true"]){
   position: relative;
-  overflow: visible;
-   /* position-anchor: --input; */
+  anchor-name: --tooltip-container;
+}
+.tooltip{
+  --popup-bg: white;
+  --scale: 0;
+  --gap-from-container: 0.25rem;
+  max-width: 30ch;
+  width: max-content;
+  position: absolute;
+  /* position-anchor: --tooltip-container;
+  position-area: bottom left; */
+  left: 50%;
+  bottom: calc(100% + var(--gap-from-container));
+  padding: var(--space-2xs);
+  font-weight: var(--fw-semibold);
+  text-wrap: balance;
+  word-break: keep-all;
+  word-wrap: break-word;
+  text-align: left;
+  background: var(--popup-bg);
+  border: 1px solid var(--clr-default-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0px 1px 8px var(--clr-dark-shadow);
+  transform: translateX(-50%) scale(1);
+  z-index: 9999;
+  &::after{
+    content: '';
+    position: absolute;
+    bottom: -8px; /* Pull it down halfway out of the tooltip */
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg) ;
+    width: 20px;
+    height: 20px;
+    background: var(--popup-bg);
+    border: 1px solid var(--clr-default-border);
+    /* transform: scale(1); */
+    /* Cuts off the top half of the rotated square so it never overlaps the body */
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    z-index: 9998;
+  }
+  /* &, &::after{
+    transform: scale(var(--scale));
+    transition: transform 0.5s ease;
+    transform-origin: bottom center;
+  } */
 }
 
 address{
@@ -339,12 +396,16 @@ button{
   max-width: max-content;
   border-radius: var(--radius-full);
   white-space: nowrap;
+  transform: scale(1);
+  transition: transform 0.5s ease;
   /* text-box: trim-both cap alphabetic; not supported in firefox */
   touch-action: manipulation; /* ?? */
-    
-    &:hover:active { /* the active state should only appear if the mouse is within the bounds on the element */
-      /* Mixes the current background color with 15% black */
-      background-color: var(--active-btn-style);
+    &:hover{
+      background-color: color-mix(in srgb, currentColor 95%, hsl(0, 0%, 0%) 5%);
+    }
+    &:active {
+      background-color: color-mix(in srgb, currentColor 92%, hsl(0, 0%, 0%) 8%);
+      transform: scale(0.96)
     }
 }
 strong{
@@ -377,19 +438,4 @@ code {
     scroll-behavior: auto !important;
   }
 }
-[role="option"]:is(
-  :focus-visible,
-  :hover,
-  :active){
-    background-color: var(--clr-surface-muted);
-}
-/*  random */
-.box{
-  padding: 1.25rem;
-  border: 2px solid;
-  max-width: max-content;
-  margin: auto auto;
-}
-.box:first-child{
-  margin-top: 10rem;
-}
+

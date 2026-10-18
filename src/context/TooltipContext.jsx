@@ -7,24 +7,25 @@ export default function TooltipProvider({ children }){
     
     const [tooltipDetails, setTooltipDetails] = useState([]);
     const generatedId = useId();
-    function handleTooltips(details){ // 
+    function setTooltip(details){ // 
         const tooltipId = details.id ?? generatedId;
         const formattedType = details.type.toLowerCase().trim();
-        const formattedContent = details.content.trim()[0].toUpperCase();
+        const formattedContent = details.content.trim().charAt(0).toUpperCase() + details.content.slice(1).trim().toLowerCase();
         const tooltipContainer = details.element?.closest('[data-tooltip-container]');
         setTooltipDetails((prev) => [...prev, { id: tooltipId, type: formattedType, container: tooltipContainer, content: formattedContent}]);
     }
 
     return(
-        <TooltipContext.Provider value={[ tooltipDetails, handleTooltips ]}>
+        <TooltipContext.Provider value={[ tooltipDetails, setTooltip ]}>
             { children }
-            {tooltipDetails?.map((tooltip, index) => (
+            {tooltipDetails?.map((tooltip) => (
                 <Tooltip 
-                key={index}
+                key={tooltip?.id}
                 id={tooltip?.id}
+                type={tooltip?.type}
                 container={tooltip?.container} 
                 content={tooltip?.content}
-                remove={() => setTooltipDetails((t) => [...t].filter(tooltips => tooltips !== tooltip?.id))}/> 
+                remove={() => setTooltipDetails((t) => [...t].filter(prevTooltips => prevTooltips.id !== tooltip?.id))}/> 
             ))}
         </TooltipContext.Provider>
     )

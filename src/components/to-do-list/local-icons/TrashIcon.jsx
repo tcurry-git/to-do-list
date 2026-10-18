@@ -1,5 +1,5 @@
 import { TbTrash } from "react-icons/tb";
-import { CustomBaseIcon } from "./CustomBaseIcon";
+import { CustomBaseIcon } from "./../../ui";
 
 export function TrashIcon(
     {
