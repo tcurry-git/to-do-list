@@ -30,53 +30,129 @@ export default function ToDoList(){
     const currDateDDMMYYYYFormat = `${String(new Date().getDate()).padStart(2, '0')}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getFullYear())}`;
     const currTimeHHMMFormat = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
     
+    const isSmallScreen = window.innerWidth <= 600;
     // INITIAL TASKS SHOULDNT BE ABLE TO BE EDITED, NO REMINDERS SHOULD SHOW, CAN'T COMPLETE OR FAVORITE ONLY DELETE
-    const generateinitialTasks = (count) => {
-        const initialTasks = [];
-        const initialTasksArr = [ "Walk the dog", "Have a shower", "Pick up Stanley", "Prepare chilli for dinner", "Get ready to meet Hugh", 
-                                  "Write biochem essay", "Apply for job", "Write English essay", "Load dishwasher", "Clean oven", "Vacuum carpet", 
-                                  "Buy t-shirt on sale" ]; // two are more tasks might pick same string
+    // const generateInitialTasks = (count) => {
+    //     const initialTasks = [];
+    //     const initialTasksArr = [ "Walk the dog", "Have a shower", "Pick up Stanley", "Prepare chilli for dinner", "Get ready to meet Hugh", 
+    //                               "Write biochem essay", "Apply for job", "Write English essay", "Load dishwasher", "Clean oven", "Vacuum carpet", 
+    //                               "Buy t-shirt on sale" ]; // two are more tasks might pick same string
+    //     const tmroDate =  `${String(new Date().getDate() + 1).padStart(2, '0')}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getFullYear())}`;
+    //     const tmroTime = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
+    //     const getRandBool = () => Math.random() > 0.5;
+    //         for (let i = 0; initialTasks.length < count; i++) {
+    //             const newInitialTask = {
+    //                 id: crypto.randomUUID(),
+    //                 task: getRandomItemFromArr(initialTasksArr),
+    //                 date: tmroDate, 
+    //                 time: tmroTime,
+    //                 isEditing: false,
+    //                 hasEdited: false,
+    //                 remindersOn: getRandBool(),
+    //                 hasReminded: getRandBool(),
+    //                 isFavorited: getRandBool(),
+    //                 isCompleted: getRandBool(),
+    //                 isLocked: true,
+    //                 createdAt: Date.now()
+    //             }
+    //             initialTasks.push(newInitialTask);
+    //         }
+    //     return initialTasks
+    // }
+    // 1. Create a ref to hold the initial tasks permanently
+   
+    const initialTasks = [
+        {
+            id: crypto.randomUUID(),
+            task: 'Walk the dog',
+            date: '20-10-2026', 
+            time: '06:00',
+            isEditing: false,
+            hasEdited: false,
+            remindersOn: true,
+            isFavorited: true,
+            isCompleted: false,
+            isLocked: true,
+            createdAt: Date.now()
+        },
+        {
+            id: crypto.randomUUID(),
+            task: 'Have a shower',
+            date: '20-10-2026', 
+            time: '09:00',
+            isEditing: false,
+            hasEdited: false,
+            remindersOn: true,
+            isFavorited: true,
+            isCompleted: false,
+            isLocked: true,
+            createdAt: Date.now()
+        },
+        {
+            id: crypto.randomUUID(),
+            task: 'Load dishwasher',
+            date: '20-10-2026', 
+            time: '11:00',
+            isEditing: false,
+            hasEdited: false,
+            remindersOn: false,
+            isFavorited: false,
+            isCompleted: false,
+            isLocked: true,
+            createdAt: Date.now()
+        },
+        {
+            id: crypto.randomUUID(),
+            task: 'Pick up Stanley',
+            date: '20-10-2026', 
+            time: '15:15',
+            isEditing: false,
+            hasEdited: false,
+            remindersOn: true,
+            isFavorited: true,
+            isCompleted: false,
+            isLocked: true,
+            createdAt: Date.now()
+        },
+        {
+            id: crypto.randomUUID(),
+            task: 'Prepare chilli for dinner',
+            date: '20-10-2026', 
+            time: '17:30',
+            isEditing: false,
+            hasEdited: false,
+            remindersOn: false,
+            isFavorited: false,
+            isCompleted: false,
+            isLocked: true,
+            createdAt: Date.now()
+        },
+    ]
+    // const initialTasksRef = useRef(null);
 
-        const getRandBool = () => Math.random() > 0.5;
-            for (let i = 0; initialTasks.length < count; i++) {
-                const newInitialTask = {
-                    id: crypto.randomUUID(),
-                    task: getRandomItemFromArr(initialTasksArr),
-                    deadline: { 
-                        date: currDateDDMMYYYYFormat, 
-                        time: currTimeHHMMFormat,
-                    },
-                    isEditing: false,
-                    hasEdited: false,
-                    remindersOn: getRandBool(),
-                    hasReminded: getRandBool(),
-                    isFavorited: getRandBool(),
-                    isCompleted: getRandBool(),
-                    isLocked: true,
-                    createdAt: Date.now()
-                }
-                initialTasks.push(newInitialTask);
-            }
-        return initialTasks
-    }
-    const initialTasks = generateinitialTasks(4);
+    // // 2. Generate them only if they haven't been created yet
+    // if (!initialTasksRef.current) {
+    //     initialTasksRef.current = isSmallScreen ? generateInitialTasks(5) : generateInitialTasks(4);
+    // }
+
+    // const initialTasks = initialTasksRef.current;
+
     const id = useId();
     const [taskCards, setTaskCards] = useState(() => {
         const savedTasks = localStorage.getItem('tasks');
-        return savedTasks ? JSON.parse(savedTasks) : initialTasks
+        if (savedTasks) {
+            return JSON.parse(savedTasks);
+        }
+        return !isSmallScreen ? initialTasks.filter(iniTask => iniTask.task !== 'Load dishwasher') : initialTasks;
     }); 
     const [isOpen, setIsOpen] = useState(false);
     const [taskCardDraft, setTaskCardDraft] = useState(null); // I think we should do { task: ', date: ', time: '' } how would we easily clear this when we save changes
     const taskTimerRef = useRef({}); // USE REF SO TIMERS PERSIST ON RELOAD/ RE-RENDER
     // const taskExpiredRef = useRef({})
-    const taskCardsRef = useRef([]);
-    // need same amount of refs as tasks
-    if (taskCardsRef.current.length !== taskCards.length) {
-        taskCardsRef.current = taskCards.map(() => React.createRef());
-    }
+    const taskCardsRef = useRef({});
+    
     
     const anyCardEditing = taskCards?.find(taskCard => taskCard?.isEditing);
-    const isSmallScreen = window.innerWidth <= 600;
     // RESET BY DEFAULT
     // useLayoutEffect(() => { // task hasn't actually been mapped when this runs, so have to wait until DOM finishes loading 
     //     if (!isEditing) return
@@ -96,13 +172,27 @@ export default function ToDoList(){
     //     return () => window.removeEventListener('mousedown', handleBounds)
     // }, [isEditing, taskCards]) // both change so must rely on both??
     // Inside TaskCard.jsx
-    
-    
     useEffect(() => {
         // Force isEditing to false for storage so refreshes never trap the overlay
         const sanitizedCards = taskCards.map(card => ({...card, isEditing: false})).
-        filter(card => card.task && card.deadline.date && card.deadline.time);
+        filter(card => card?.task && card?.deadline?.date && card?.deadline?.time);
         localStorage.setItem('tasks', JSON.stringify(sanitizedCards));
+    }, [taskCards])
+
+    useEffect(() => {
+        const cardsObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.intersectionRatio < 1) entry.target.classList.add("notFullyOnScreen");
+            });
+        })
+
+        const allTaskElements = Object.values(taskCardsRef.current);
+        allTaskElements.forEach(el => {
+            if (el) cardsObserver.observe(el)
+        });
+
+        return () => cardsObserver.disconnect();
+        // observe all task dom nodes
     }, [taskCards])
 
     useEffect(() => {
@@ -139,9 +229,9 @@ export default function ToDoList(){
         handleReminders(); // runs instantly first
         const reminderInterval = setInterval(() => {
            handleReminders();
-        }, SEC * 10) // 10sec
+        }, SEC * 30) // 5 sec
         return () => clearInterval(reminderInterval); // when would we ever unmount 
-    }, [Notification.permission]) // if notifications aren't enabled on mount, the useEffect will never run!
+    }, [taskCards.length]) // if notifications aren't enabled on mount, the useEffect will never run!
 
 
     function handleReminders(){
@@ -153,9 +243,8 @@ export default function ToDoList(){
                 const deadlineTime = getDeadlineTimestamp(taskCard.deadline);
                 const timeRemaining = deadlineTime - dateNow;
                 
-                if (timeRemaining <= HALF_HOUR && timeRemaining > 0  && taskCard?.remindersOn && !taskCard.hasReminded){
-                    console.log(Notification.permission);
-                    if (Notification.permission === 'granted') {
+                if (timeRemaining <= HALF_HOUR && timeRemaining > 0 && !taskCard.hasReminded){
+                    if (taskCard?.remindersOn && Notification.permission === 'granted'){
                         const newNotif = new Notification('To Do List: Reminders', {
                             body: `pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}`,
                             tag: `warning-notif-${taskCard.id}`
@@ -173,9 +262,8 @@ export default function ToDoList(){
                     }
                 };
                 
-                if(timeRemaining <= 0  && taskCard?.remindersOn && !taskCard.hasExpired) {
-                    console.log(`expired ${Notification.permission}`);
-                    if (Notification.permission === 'granted'){
+                if(timeRemaining <= 0  && !taskCard.hasExpired) {
+                    if (taskCard?.remindersOn && Notification.permission === 'granted'){
                         const newNotif = new Notification('To Do List: Reminders', {
                             body: `task: ${taskCard.task} has now expired...`,
                             tag: `expired-notif-${taskCard.id}`
@@ -199,6 +287,7 @@ export default function ToDoList(){
 
     function handleAddTask(){
         //max ten tasks
+
         if (taskCards.length >= 50) {
             setTooltipDetails({
                 type: 'error', 
@@ -206,6 +295,7 @@ export default function ToDoList(){
                 content: 'Max task limit reached'
             }); 
         }
+        
         const newID = crypto.randomUUID();
         const newTaskCard = { 
             id: newID, 
@@ -216,7 +306,7 @@ export default function ToDoList(){
             } ,
             isEditing: true,
             hasEdited: false,
-            remindersOn: Boolean(Notification.permission === 'granted'),
+            remindersOn: false,
             hasReminded: false,
             hasExpired: false,
             isFavorited: false,
@@ -422,7 +512,7 @@ export default function ToDoList(){
     function handleSetReminders(id){
         const err = () => alert('Need permission to send browser notifications if you want to be sent reminders');
         const ifGranted = () => {
-            setTaskCards((t) => [...t].map((taskCard) => taskCard.id === id ? {...taskCard, remindersOn: !taskCard.remindersOn} : taskCard));
+            setTaskCards((t) => [...t].map((taskCard) => taskCard.id === id ? {...taskCard, remindersOn: true} : taskCard));
             setAnnouncementText('task reminders on');
         }
         if (Notification.permission === 'granted'){
@@ -502,11 +592,15 @@ export default function ToDoList(){
                         </section>
                         <section>
                             {/* false means only notify the thing changed. all just means it notifies the user when text changes, and when DOM elements are added/deleted */}
-                            <ul data-tooltip-container className={styles.tasksList} >
-                                {taskCards.map((taskCard, index) => {
+                            <ul data-tooltip-container className={styles.tasksList}>
+                                {taskCards.map((taskCard) => {
                                     const isEditingSpecificTaskCard = (taskCard.id === taskCardDraft?.taskID) && taskCard?.isEditing 
                                     return (
-                                    <li key={taskCard.id} id={taskCard.id} ref={taskCardsRef.current[index]} tabIndex={0}
+                                    <li key={taskCard.id} id={taskCard.id} tabIndex={0}
+                                        ref={el => {
+                                            if (el) taskCardsRef.current[taskCard.id] = el;
+                                            else delete taskCardsRef.current[taskCard.id];
+                                        }} 
                                         className={[styles.taskCard, 
                                             taskCard.isCompleted && !taskCard.isLocked && !taskCard.isFavorited && `${styles.taskCompleted} ${styles.fadeOut}`,
                                             taskCard.isCompleted && !taskCard.isLocked && taskCard.isFavorited && styles.taskCompleted,
@@ -531,7 +625,7 @@ export default function ToDoList(){
                                         <div data-taskcard-inputs className={styles.taskInputs}>
                                             <div data-tooltip-container>
                                                 <Input autoFocus={isEditingSpecificTaskCard} className={`text-sm ${styles.task}`} aria-label='Enter task' inert={!isEditingSpecificTaskCard} 
-                                                value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).task : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.task : taskCard.task} // was taskTitle
+                                                value={taskCard.isLocked ? taskCard.task : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.task : taskCard.task} // was taskTitle
                                                 onChange={(e, inputId) => {
                                                     const taskFormatted = e.target.value.replace(/[^a-zA-Z\s]/g, "");
                                                     handleTaskCardDraftInput('task', taskFormatted, inputId)
@@ -545,7 +639,7 @@ export default function ToDoList(){
                                                 <span className={styles.deadlineTitle}><strong>Deadline: </strong></span>
                                                 <div data-tooltip-container className={styles.deadlineDate}>
                                                     <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} inert={!isEditingSpecificTaskCard} aria-label="Enter date of deadline in DDMMYYYY format" 
-                                                    value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).deadline.date : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.date : taskCard.deadline.date} 
+                                                    value={taskCard.isLocked ? taskCard.date : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.date : taskCard.deadline.date} 
                                                     onKeyDown={(e) => (e.key === "Backspace" && e.target.value.trim() === '') && focusLast(e.target)}
                                                     onChange={(e, inputId) => {
                                                         const dateFormatted = handleDateFormat(e.target.value);
@@ -557,7 +651,7 @@ export default function ToDoList(){
                                                 </div>
                                                 <div data-tooltip-container className={styles.deadlineTime}>
                                                     <Input tabIndex={isEditingSpecificTaskCard ? 0 : -1} inert={!isEditingSpecificTaskCard} aria-label="Enter time of deadline in HHMM format"                                                 
-                                                    value={taskCard.isLocked ? getRandomItemFromArr(initialTasks).deadline.time : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.time : taskCard.deadline.time} 
+                                                    value={taskCard.isLocked ? taskCard.time : (taskCardDraft?.taskID === taskCard.id) ? taskCardDraft?.time : taskCard.deadline.time} 
                                                     onKeyDown={(e) => (e.key === "Backspace" && e.target.value.trim() === '') && focusLast(e.target)}
                                                     onChange={(e, inputId) => {
                                                         const timeFormatted = handleTimeFormat(e.target.value);

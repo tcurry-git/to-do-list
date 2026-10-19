@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import styles from './BackToTop.module.css'
+import styles from './BackToTop.module.css';
 import { TbArrowUp } from "react-icons/tb";
 import { Button } from '../button/Button';
 
-export function BackToTop({...props}){
+export function BackToTop({container, ...props}){
     const [showBtn, setShowBtn] = useState(false);
 
     useEffect(() => {

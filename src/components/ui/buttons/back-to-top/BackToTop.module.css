@@ -1,10 +1,10 @@
 .backToTop{
-    --right-dist: var(--space-md);
-    --bottom-dist: var(--space-xs);
+    --right-dist: clamp(var(--space-3xs), calc(var(--space-3xs) + 1vw - 4vw), var(--space-md));
+    --bottom-dist: clamp(var(--space-3xs), calc(var(--space-3xs) + 1vw - 4vw), var(--space-xs));
     position: fixed;
     right: var(--right-dist);
     bottom: var(--bottom-dist);
-    padding: var(--space-2xs);
+    padding: clamp(var(--space-4xs), calc(var(--space-4xs) + 1vw - 4px), var(--space-2xs));
     border-radius: var(--radius-full);
     display: flex;
     justify-content: center;

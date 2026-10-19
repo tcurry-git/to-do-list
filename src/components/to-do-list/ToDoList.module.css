@@ -110,9 +110,9 @@
         z-index: 999;
             &.sliderOpen{
                 transform: translateX(0);
-                & .actionBtns{
+                /* & .actionBtns{
                     box-shadow: var(--sm-shadow) var(--clr-default-shadow);
-                }
+                } */
             }
             & .actionBtnsContainer{
                 position: relative;
@@ -141,6 +141,7 @@
                     border-bottom-left-radius: var(--border-radii);
                     border-top-left-radius: var(--border-radii);
                     border-top-left-radius: 0;
+                    border: 1px solid var(--clr-default-border);
                     padding: var(--space-2xs);
                     box-shadow: 0;
                     transition: box-shadow 0.25s ease 0.05s;
@@ -193,6 +194,13 @@
             }
         }
         &.taskCardEditing{
+            isolation: isolate; /* ignores stacking traps */
+            transform: scale(1.025);
+            z-index: 1000;
+        }
+        &.notFullyOnScreen{
+            position: fixed;
+            inset: 0;
             isolation: isolate; /* ignores stacking traps */
             transform: scale(1.025);
             z-index: 1000;

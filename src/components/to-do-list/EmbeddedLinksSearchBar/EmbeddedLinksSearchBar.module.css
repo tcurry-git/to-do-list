@@ -41,12 +41,15 @@
     border-radius: var(--radius-full);
 }
 .searchItems{
-    width: 100%;
+    width: calc(100% + 1.5rem);
     position: absolute;
+    left: 50%;
     top: calc(100% + 6px);
+    transform: translateX(-50%);
     display: grid;
     background-color: white;
     border-radius: var(--radius-lg);
+    border: 1px solid var(--clr-default-border);
     box-shadow: 0 2px 10px var(--clr-soft-lightblue);
     z-index: 999;
     & > :not(:last-child){

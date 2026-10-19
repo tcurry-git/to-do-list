@@ -134,7 +134,9 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNe
                                     elementToGoTo?.focus();
                                     setAnnouncerText(announcerMsg);
                                     reset();
-                                }}>
+                                }}
+                                onMouseEnter={() => setFocusedID(filItem.id)}
+                                onMouseLeave={() => setFocusedID(null)}>
                                     <SearchIcon color='black' size='var(--icon-sm)'/>
                                     <p>{filItem.task}</p>
                                 </div>
