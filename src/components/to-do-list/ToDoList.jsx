@@ -227,15 +227,14 @@ export default function ToDoList(){
     }, [taskCards]);
 
     useEffect(() => { 
-        handleReminders(); // runs instantly first
         const reminderInterval = setInterval(() => {
            handleReminders();
-        }, SEC * 10) // 5 sec
+        }, SEC * 3) // 5 sec
         return () => clearInterval(reminderInterval); // when would we ever unmount 
     }, [taskCards.length]) // should be whenever notification btn is clicked
 
 
-    async function handleReminders(){
+    function handleReminders(){
         const HALF_HOUR = HOUR / 2;
         const dateNow = Date.now();
         setTaskCards((t) => [...t].map((taskCard) => {
@@ -245,14 +244,16 @@ export default function ToDoList(){
                 const timeRemaining = deadlineTime - dateNow;
                 
                 if (timeRemaining <= HALF_HOUR && timeRemaining > 0){
-                    if (taskCard?.remindersOn && !taskCard.shownWarningNotif){
+                    if (taskCard?.remindersOn && !taskCard.shownWarningNotif && Notification.permission === 'granted'){
+                        console.log("Triggering warning notification for:", taskCard.task);
                        sendNotification('To Do List: Reminders', {
                             body: `pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}`,
                             tag: `warning-notif-${taskCard.id}`,
                             icon: `${import.meta.env.BASE_URL}assets/app-icon.svg`
                         })
-                        return {...taskCard, shownWarningNotif: true,}
-                    } else if (!taskCard.hasReminded){
+                        return {...taskCard, shownWarningNotif: true}
+                    } 
+                    if (!taskCard.hasReminded){
                         return {
                             ...taskCard, 
                             hasReminded: true
@@ -261,14 +262,15 @@ export default function ToDoList(){
                 };
                 
                 if (timeRemaining <= 0) {
-                    if (taskCard?.remindersOn){
+                    if (taskCard?.remindersOn && !taskCard.shownExpiredNotif && Notification.permission === 'granted'){
                         sendNotification('To Do List: Reminders', {
                             body: `task ${taskCard.task} has now expired...`,
                             tag: `expired-notif-${taskCard.id}`,
                             icon: `${import.meta.env.BASE_URL}assets/app-icon.svg`
                         })
-                        return {...taskCard, shownExpiredNotif: true,}
-                    } else if (!taskCard.hasExpired){
+                        return {...taskCard, shownExpiredNotif: true}
+                    } 
+                    if (!taskCard.hasExpired){
                         return {
                             ...taskCard,  
                             hasExpired: true, 
