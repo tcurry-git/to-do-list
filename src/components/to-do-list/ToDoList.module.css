@@ -43,7 +43,7 @@
     align-items: center;
     & .addTaskBtn{
         --addTaskBtn-minw: 50%;
-        width: clamp(var(--addTaskBtn-minw), calc(var(--addTaskBtn-minw) + 1vw - 4px), 100%);
+        width: var(--addTaskBtn-minw);
         display: flex;
         gap: var(--space-3xs);
         justify-content: center;
@@ -55,7 +55,7 @@
         border-radius: var(--radius-full);
   
     }
-    @media (max-width: 400px){
+    @media (max-width: 500px){
         .addTaskBtn{
             min-width: 100%;
         }
