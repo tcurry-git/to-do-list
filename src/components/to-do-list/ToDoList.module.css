@@ -268,7 +268,7 @@
             }
             & .task{
                 line-height: var(--lh-base);
-                font-size: clamp(var(--fs-3xs), calc(var(--fs-3xs) + 1vw - 6px), var(--fs-sm));
+                font-size: clamp(var(--fs-2xs), calc(var(--fs-2xs) + 1vw - 6px), var(--fs-sm));
                 overflow-x: scroll;
             }
             & .taskDeadline{

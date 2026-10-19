@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useId } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import styles from './ToDoList.module.css';
 import { useAnnounce, useTooltip } from '../../context/index.js';
 import { Overlay } from '../global';
 import { Input, Button, BackToTop } from '../ui';
 import EmbeddedLinksSearchBar from './EmbeddedLinksSearchBar/EmbeddedLinksSearchBar.jsx';
 import { CompletedTaskIcon, AlarmClockIcon, PlusIcon, StarIcon, TrashIcon, NotificationIcon, ExclamationMarkIcon, ExpiredTaskIcon } from './local-icons';
-
+import { sendNotification } from '../../utils/notiication.jsx';
 
 import { TbArrowBarToRight, TbEdit, TbSparkles } from 'react-icons/tb';
 // if you have the same two components in an app you must useId to keep ids unique
@@ -231,10 +231,10 @@ export default function ToDoList(){
            handleReminders();
         }, SEC * 30) // 5 sec
         return () => clearInterval(reminderInterval); // when would we ever unmount 
-    }, [taskCards.length]) // if notifications aren't enabled on mount, the useEffect will never run!
+    }, [taskCards.length]) // should be whenever notification btn is clicked
 
 
-    function handleReminders(){
+    async function handleReminders(){
         const HALF_HOUR = HOUR / 2;
         const dateNow = Date.now();
         setTaskCards((t) => [...t].map((taskCard) => {
@@ -244,17 +244,12 @@ export default function ToDoList(){
                 const timeRemaining = deadlineTime - dateNow;
                 
                 if (timeRemaining <= HALF_HOUR && timeRemaining > 0 && !taskCard.hasReminded){
-                    if (taskCard?.remindersOn && Notification.permission === 'granted'){
-                        const newNotif = new Notification('To Do List: Reminders', {
+                    if (taskCard?.remindersOn){
+                       sendNotification('To Do List: Reminders', {
                             body: `pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}`,
-                            tag: `warning-notif-${taskCard.id}`
-                        });
-                        if (newNotif){
-                            newNotif.onclick = () => {
-                                window?.focus();
-                                newNotif?.close()
-                            }  
-                        }
+                            tag: `warning-notif-${taskCard.id}`,
+                            icon: '/assets/app-icon.svg',
+                        })
                     } 
                     return {
                         ...taskCard, 
@@ -263,17 +258,12 @@ export default function ToDoList(){
                 };
                 
                 if(timeRemaining <= 0  && !taskCard.hasExpired) {
-                    if (taskCard?.remindersOn && Notification.permission === 'granted'){
-                        const newNotif = new Notification('To Do List: Reminders', {
-                            body: `task: ${taskCard.task} has now expired...`,
-                            tag: `expired-notif-${taskCard.id}`
-                        });
-                        if (newNotif){
-                            newNotif.onclick = () => {
-                                window?.focus();
-                                newNotif?.close()
-                            }
-                        }
+                    if (taskCard?.remindersOn){
+                        sendNotification('To Do List: Reminders', {
+                            body: `task ${taskCard.task} has now expired...`,
+                            tag: `expired-notif-${taskCard.id}`,
+                            icon: '/assets/app-icon.svg',
+                        })
                     }
                     return {
                         ...taskCard,  
