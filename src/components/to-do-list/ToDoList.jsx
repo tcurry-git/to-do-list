@@ -179,21 +179,21 @@ export default function ToDoList(){
         localStorage.setItem('tasks', JSON.stringify(sanitizedCards));
     }, [taskCards])
 
-    useEffect(() => {
-        const cardsObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.intersectionRatio < 1) entry.target.classList.add("notFullyOnScreen");
-            });
-        })
+    // useEffect(() => {
+    //     const cardsObserver = new IntersectionObserver(entries => {
+    //         entries.forEach(entry => {
+    //             if (entry.intersectionRatio < 1) entry.target.classList.add("notFullyOnScreen");
+    //         });
+    //     })
 
-        const allTaskElements = Object.values(taskCardsRef.current);
-        allTaskElements.forEach(el => {
-            if (el) cardsObserver.observe(el)
-        });
+    //     const allTaskElements = Object.values(taskCardsRef.current);
+    //     allTaskElements.forEach(el => {
+    //         if (el) cardsObserver.observe(el)
+    //     });
 
-        return () => cardsObserver.disconnect();
-        // observe all task dom nodes
-    }, [taskCards])
+    //     return () => cardsObserver.disconnect();
+    //     // observe all task dom nodes
+    // }, [taskCards])
 
     useEffect(() => {
         //how does this work
@@ -485,7 +485,7 @@ export default function ToDoList(){
         setTaskCardDraft(null);
     }
     function handleStartEditing(id){ // reset logic
-        const cardBeingEdited = taskCards.find(taskCard => taskCard.id === id && !taskCard.hasReminded);
+        const cardBeingEdited = taskCards.find(taskCard => taskCard.id === id);
         if (!cardBeingEdited) return;
         setTaskCardDraft({
             taskID: cardBeingEdited?.id,

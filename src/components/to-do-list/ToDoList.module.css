@@ -198,13 +198,13 @@
             transform: scale(1.025);
             z-index: 1000;
         }
-        &.notFullyOnScreen{
+        /* &.notFullyOnScreen{
             position: fixed;
             inset: 0;
-            isolation: isolate; /* ignores stacking traps */
+            isolation: isolate; /* ignores stacking traps * /
             transform: scale(1.025);
             z-index: 1000;
-        }
+        } */
         & :is(.taskWarningWidget,
         & .taskExpiredWidget){
             --widg-top-dist: -.6rem;
