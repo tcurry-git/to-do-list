@@ -21,7 +21,9 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNe
     const [searchQueryFromList, setSearchQueryFromList] = useState('')
     const [focusedID, setFocusedID] = useState(null);
 
+
     const searchInputRef = useRef(null);
+    const searchBtnRef = useRef(null);
 
     const tasksWithIdArr = itemsToSearchThrough.map(item => ({id: item.id, task: item.task}));
     const searchQueryErrMsg = 'Warning: task not found - try to be more specific'
@@ -83,6 +85,7 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNe
             }
         }
     }
+
     return(
         <>
         {/* **IMPORTANT** LOOK AT YT SEARCH BAR WHEN YOU SCROLL VALUE GETS APPENDED TO CURRENT VALUE */}
@@ -94,6 +97,32 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNe
             if (!(parent.contains(currElementFocused))) reset();
         }}>
             <div className={styles.searchBox} data-tooltip-container>
+            {searchQuery && <Button className={styles.clearSearchQueryBtn} aria-label='Clear search query' onClick={() => { setSearchQuery(''), searchInputRef.current?.focus()} }><ClearSearchIcon/></Button>}
+            {searchQuery && isOpen && filtered.length > 0 && ( 
+                <div data-embedded-links-searchbar-opt-cont id={`${id}-searchItems`} className={styles.searchItems} style={{'--search-btn-width': `${searchBtnRef.current.getBoundingClientRect().width}px`}} role='listbox' >
+                    {filtered.map((filItem) => {
+                        const isSelected = focusedID === filItem.id; // creates an illusion on focus navigation because its triggering a class which looks like the searchOpt is receiving focus
+                        const optID = `${filItem.id}-opt`;
+                        return (
+                            <div key={filItem.id} id={optID} role='option' className={`${styles.searchOpt} ${isSelected && styles.searchOptSelected}`} tabIndex={-1}
+                            aria-selected={isSelected}
+                            onPointerDown={(e) => {
+                                e.preventDefault(); // need this because pointer down automatically triggers blur which hides search list
+                                const elementToGoTo = document.getElementById(filItem.id);
+                                elementToGoTo?.scrollIntoView();
+                                elementToGoTo?.focus();
+                                setAnnouncerText(announcerMsg);
+                                reset();
+                            }}
+                            onMouseEnter={() => setFocusedID(filItem.id)}
+                            onMouseLeave={() => setFocusedID(null)}>
+                                <SearchIcon color='black' size='var(--icon-sm)'/>
+                                <p>{filItem.task}</p>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
                 <Input role='combobox' id={`${id}-searchInput`} ref={searchInputRef} className={styles.search} style={{padding: `${paddingNearby} var(--space-xs)`}} value={searchQueryFromList || searchQuery} 
                 aria-label='Search for task' aria-autocomplete='list' aria-controls={`${id}-searchItems`} aria-expanded={Boolean(filtered.length > 0)}
                 aria-activedescendant={focusedID ? `${focusedID}-opt` : undefined}
@@ -118,34 +147,9 @@ export default function EmbeddedLinksSearchBar({ itemsToSearchThrough, paddingNe
                 }}
                 autoComplete='off' spellCheck='false'
                 placeholder='Search for task..'/>
-                {searchQuery && <Button className={styles.clearSearchQueryBtn} aria-label='Clear search query' onClick={() => { setSearchQuery(''), searchInputRef.current?.focus()} }><ClearSearchIcon/></Button>}
-                {searchQuery && isOpen && filtered.length > 0 && ( 
-                    <div data-embedded-links-searchbar-opt-cont id={`${id}-searchItems`} className={styles.searchItems} role='listbox' >
-                        {filtered.map((filItem) => {
-                            const isSelected = focusedID === filItem.id; // creates an illusion on focus navigation because its triggering a class which looks like the searchOpt is receiving focus
-                            const optID = `${filItem.id}-opt`;
-                            return (
-                                <div key={filItem.id} id={optID} role='option' className={`${styles.searchOpt} ${isSelected && styles.searchOptSelected}`} tabIndex={-1}
-                                aria-selected={isSelected}
-                                onPointerDown={(e) => {
-                                    e.preventDefault(); // need this because pointer down automatically triggers blur which hides search list
-                                    const elementToGoTo = document.getElementById(filItem.id);
-                                    elementToGoTo?.scrollIntoView();
-                                    elementToGoTo?.focus();
-                                    setAnnouncerText(announcerMsg);
-                                    reset();
-                                }}
-                                onMouseEnter={() => setFocusedID(filItem.id)}
-                                onMouseLeave={() => setFocusedID(null)}>
-                                    <SearchIcon color='black' size='var(--icon-sm)'/>
-                                    <p>{filItem.task}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
             </div>
-            <Button className={styles.searchBtn} aria-label='Click to search' 
+            <Button className={styles.searchBtn} ref={searchBtnRef}
+            aria-label='Click to search' 
             onMouseDown={(e) => e.preventDefault()} // 
             onClick={() => {
                 const inputNode = searchInputRef?.current;

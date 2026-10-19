@@ -8,6 +8,7 @@ import { CompletedTaskIcon, AlarmClockIcon, PlusIcon, StarIcon, TrashIcon, Notif
 import { sendNotification } from '../../utils/notiication.jsx';
 
 import { TbArrowBarToRight, TbEdit, TbSparkles } from 'react-icons/tb';
+
 // if you have the same two components in an app you must useId to keep ids unique
 // use custom data attributes to select elements in JS so if you want to change a CSS class you won't have to change it in your JS
 // think about doing reminder and then get icons, disable setting a date before today and style!
@@ -229,7 +230,7 @@ export default function ToDoList(){
         handleReminders(); // runs instantly first
         const reminderInterval = setInterval(() => {
            handleReminders();
-        }, SEC * 30) // 5 sec
+        }, SEC * 10) // 5 sec
         return () => clearInterval(reminderInterval); // when would we ever unmount 
     }, [taskCards.length]) // should be whenever notification btn is clicked
 
@@ -238,36 +239,40 @@ export default function ToDoList(){
         const HALF_HOUR = HOUR / 2;
         const dateNow = Date.now();
         setTaskCards((t) => [...t].map((taskCard) => {
-            if (taskCard.isCompleted || taskCard.isLocked) return taskCard;
+            if (taskCard.isCompleted || taskCard.isLocked || !taskCard) return taskCard;
                 
                 const deadlineTime = getDeadlineTimestamp(taskCard.deadline);
                 const timeRemaining = deadlineTime - dateNow;
                 
-                if (timeRemaining <= HALF_HOUR && timeRemaining > 0 && !taskCard.hasReminded){
-                    if (taskCard?.remindersOn){
+                if (timeRemaining <= HALF_HOUR && timeRemaining > 0){
+                    if (taskCard?.remindersOn && !taskCard.shownWarningNotif){
                        sendNotification('To Do List: Reminders', {
                             body: `pssst, you have roughly ${Math.ceil(timeRemaining / 60000)} minute(s) left to complete task: ${taskCard.task}`,
                             tag: `warning-notif-${taskCard.id}`,
-                            icon: '/assets/app-icon.svg',
+                            icon: `${import.meta.env.BASE_URL}assets/app-icon.svg`
                         })
-                    } 
-                    return {
-                        ...taskCard, 
-                        hasReminded: true
+                        return {...taskCard, shownWarningNotif: true,}
+                    } else if (!taskCard.hasReminded){
+                        return {
+                            ...taskCard, 
+                            hasReminded: true
+                        }
                     }
                 };
                 
-                if(timeRemaining <= 0  && !taskCard.hasExpired) {
+                if (timeRemaining <= 0) {
                     if (taskCard?.remindersOn){
                         sendNotification('To Do List: Reminders', {
                             body: `task ${taskCard.task} has now expired...`,
                             tag: `expired-notif-${taskCard.id}`,
-                            icon: '/assets/app-icon.svg',
+                            icon: `${import.meta.env.BASE_URL}assets/app-icon.svg`
                         })
-                    }
-                    return {
-                        ...taskCard,  
-                        hasExpired: true, 
+                        return {...taskCard, shownExpiredNotif: true,}
+                    } else if (!taskCard.hasExpired){
+                        return {
+                            ...taskCard,  
+                            hasExpired: true, 
+                        }
                     }
                 }
             return taskCard; // default return for unhandled cases (say this condition: timeRemaining <= TEN_MINS && timeRemaining > 0 is met but this one:  !taskCard.hasReminded isnt)
@@ -298,6 +303,8 @@ export default function ToDoList(){
             hasEdited: false,
             remindersOn: false,
             hasReminded: false,
+            shownWarningNotif: false,
+            shownExpiredNotif: false,
             hasExpired: false,
             isFavorited: false,
             isCompleted: false, 
