@@ -1,16 +1,32 @@
-# React + Vite
+Title: **TODO app** 
+Timeline: **SEPT 2026 - NOW (ONGOING)**
+Stack: **HTML, CSS, JS, React, Vite**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+WHAT IT DOES:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+This project allows to add tasks and then create your own task with a desired deadline. You can do basic things like favourite the task, mark the task as completed, delete the task but the more useful features give you the ability to edit a task you've already created and set reminders for specific tasks. There's also a search bar for finding tasks which is good if you have a lot of ongoing tasks you need to manage, there's also sorting and global task management where you can sort by deadline, unfavourite all tasks and delete all tasks. The reminders are just browser notifications not system push notifications so its practical use is limited, but this is fine because that wasn't the aim, the aim was just to learn JS and have a basic project to show at the end of it, and I've succeeded in that sense. Finally, I implemented error messages in the form of tooltips for the input fields, and a site wide announcer that announces actions that have been completed to screen readers (haven't tested this yet because its not fully finished however it should work as its just a div with aria-live that gets its text content dynamically injected).
 
-Currently, two official plugins are available:
+WHY I CREATED IT:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+This project was created because I wanted to learn more about JavaScript so I'd be able to implement more functionality within my projects and also just to widen my knowledge, and also to dip my toes into the React library as it seems to be the single most widely used tool for front-end development. So, I delved right into to some React tutorials and starting learning things like how to map JavaScript arrays into HTML elements and how to make components. This opened my eyes massively as I could already imagine the possibilities with this and how easy it would be to create bigger websites and apps if you had components that you could just stick in anywhere and customize their functionality and how they look with props. I played around for a bit with this and then I did some research on what the best way to learn JS is, and found making a To Do List is widely regarded as the best beginner project out there. I then searched up some examples of what a To Do List should look like, what features it should have etc and stumbled upon a tutorial which I followed in order to make an extremely basic one and learn some basic JS in the process. This was ok, I understood everything, but I knew that the skills I learnt from that project were far too basic and I'd have to learn some more advanced JS so I could actually take what I've learnt and use it in industry inside real-world projects. This is I where I took it upon myself to just create my own To Do List and learn along the way in the midst of actually creating something, as that is how I learn best after-all. To help guide my through the creation of the project, as I am only a junior, I did use YouTube and AI (Gemini), however, I tried to stray away from vibe-coding as much as possible and I did want to actually understand what's going on. Throughout the project I focused a lot on implementing front-end and React best practices such as ensuring the codebase is organised and broken up into intuitive folders and file names, as well as using barrel files with named exports in order to efficiently group exports and imports, how to properly break up every inch of the site in to components, implementing portals for the overlays and tooltips, creating context for site wide features such as the tooltips and the announcer, and then accessibility, so using the correct ARIA attributes / roles where necessary.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+BIGGEST STRUGGLE(S):
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The reminders feature was the biggest struggle I encountered by far because at first I tried using the Notification API to generate browser notifications which worked on desktop, but then when I tested on mobile it crashed the whole app / website when a notification would try to send. I found the reason for this was because mobile browsers require you to register a 'Service Worker' before sending notifications as they have tighter restrictions on how notifications must be shown compared to desktop browsers.
 
-## React Compiler
+PLANS FOR FUTURE FEATURES / UPDATES:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+• Error handling - Use more try-catch blocks where necessary to ensure bugs don't break the app
+• UI updates - Improve how mini-slider looks, improve how the buttons look
+• Cross-browser and theme optimization - Was made crystal clear to me during testing (showing the project to friends and family) that it completely broke on the Samsung Browser and I'm sure also breaks on other browser too. It's also strictly built in light-mode, i.e. if the user has dark mode as their preferred theme, it doesn't use darker colors that are easier on the eyes it stays bright and colourful. 
+• Settings - Menu that allows users to personalize the app as they please. For example, currently the reminders are hard-coded to only show 30min before the deadline, would be nice if the user could say they wanted a reminder say 6 hours before if its quite an important and involved thing they have to complete like a school essay.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+WHAT IM GOING TO LEARN NEXT:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+• Service workers - Learn more in-depth about how service workers work. Glossed over this when implementing the reminders feature in the project.
+• Shadcn UI library + tailwind - I personally like using regular old CSS files which is why I use CSS modules in this project, however, these tools seem to used a lot in real-world projects so I might as well broaden my horizon of knowledge even further by learning these.
+• Typescript - Apparently no one uses Vanilla JS anymore! Once I spent some more time getting comfortable with Vanilla JS, I'll look into this.
 
-## Expanding the ESLint configuration
+**How to use: Given this isn't an actual app but kind of functions like one, you can pin it to your browser and use it day-to-day like you would if were an app (However, notifications only show if are within the browser)**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Project Here:** [https://tcurry-git.github.io/to-do-list/](https://tcurry-git.github.io/to-do-list/)
