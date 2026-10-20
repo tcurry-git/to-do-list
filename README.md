@@ -29,6 +29,6 @@ WHAT IM GOING TO LEARN NEXT:
 • Shadcn UI library + tailwind - I personally like using regular old CSS files which is why I use CSS modules in this project, however, these tools seem to used a lot in real-world projects so I might as well broaden my horizon of knowledge even further by learning these.
 • Typescript - Apparently no one uses Vanilla JS anymore! Once I spent some more time getting comfortable with Vanilla JS, I'll look into this.
 
-**How to use: Given this isn't an actual app but kind of functions like one, you can pin it to your browser and use it day-to-day like you would if were an app (However, notifications only show if are within the browser)**
+**How to use:** if you want to try it out, ensure you are using either the Chrome, Edge or Safari browser, and if you use Safari you must add it to your phone screen so it becomes a little app icon on your phone so the browser notifications actually work.
 
 **Project Here:** [https://tcurry-git.github.io/to-do-list/](https://tcurry-git.github.io/to-do-list/)
