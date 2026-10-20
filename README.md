@@ -1,6 +1,8 @@
-Title: **TODO app** 
-Timeline: **SEPT 2026 - NOW (ONGOING)**
-Stack: **HTML, CSS, JS, React, Vite**
+**TODO app** 
+
+**SEPT 2026 - NOW (ONGOING)**
+
+**HTML, CSS, JS, React, Vite**
 
 WHAT IT DOES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
