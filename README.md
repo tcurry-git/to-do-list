@@ -19,14 +19,19 @@ The reminders feature was the biggest struggle I encountered by far because at f
 PLANS FOR FUTURE FEATURES / UPDATES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 • Error handling - Use more try-catch blocks where necessary to ensure bugs don't break the app
+
 • UI updates - Improve how mini-slider looks, improve how the buttons look
+
 • Cross-browser and theme optimization - Was made crystal clear to me during testing (showing the project to friends and family) that it completely broke on the Samsung Browser and I'm sure also breaks on other browser too. It's also strictly built in light-mode, i.e. if the user has dark mode as their preferred theme, it doesn't use darker colors that are easier on the eyes it stays bright and colourful. 
+
 • Settings - Menu that allows users to personalize the app as they please. For example, currently the reminders are hard-coded to only show 30min before the deadline, would be nice if the user could say they wanted a reminder say 6 hours before if its quite an important and involved thing they have to complete like a school essay.
 
 WHAT IM GOING TO LEARN NEXT:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 • Service workers - Learn more in-depth about how service workers work. Glossed over this when implementing the reminders feature in the project.
+
 • Shadcn UI library + tailwind - I personally like using regular old CSS files which is why I use CSS modules in this project, however, these tools seem to used a lot in real-world projects so I might as well broaden my horizon of knowledge even further by learning these.
+
 • Typescript - Apparently no one uses Vanilla JS anymore! Once I spent some more time getting comfortable with Vanilla JS, I'll look into this.
 
 **How to use:** if you want to try it out, ensure you are using either the Chrome, Edge or Safari browser, and if you use Safari you must add it to your phone screen so it becomes a little app icon on your phone so the browser notifications actually work.
