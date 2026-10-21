@@ -6,7 +6,7 @@ Stack: **HTML, CSS, JS, React, Vite**
 
 WHAT IT DOES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-This project allows to add tasks and then create your own task with a desired deadline. You can do basic things like favourite the task, mark the task as completed, delete the task but the more useful features give you the ability to edit a task you've already created and set reminders for specific tasks. There's also a search bar for finding tasks which is good if you have a lot of ongoing tasks you need to manage, there's also sorting and global task management where you can sort by deadline, unfavourite all tasks and delete all tasks. The reminders are just browser notifications not system push notifications so its practical use is limited, but this is fine because that wasn't the aim, the aim was just to learn JS and have a basic project to show at the end of it, and I've succeeded in that sense. Finally, I implemented error messages in the form of tooltips for the input fields, and a site wide announcer that announces actions that have been completed to screen readers (haven't tested this yet because its not fully finished however it should work as its just a div with aria-live that gets its text content dynamically injected).
+This project allows to add tasks and then create your own task with a desired deadline. You can do basic things like favourite the task, mark the task as completed, delete the task but the more useful features give you the ability to edit a task you've already created and set reminders for specific tasks. There's also a search bar for finding tasks which is good if you have a lot of ongoing tasks you need to manage, there's also sorting and global task management where you can sort by deadline, unfavourite all tasks and delete all tasks. The reminders are just browser notifications not system push notifications so its practical use is limited, but this is fine because that wasn't the aim, the aim was just to learn JS and have a basic project to show at the end of it, and I've succeeded in that sense. Finally, I implemented error messages in the form of tooltips for the input fields, and a site wide announcer that announces actions that have been completed to screen readers.
 
 WHY I CREATED IT:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -15,6 +15,12 @@ This project was created because I wanted to learn more about JavaScript so I'd 
 BIGGEST STRUGGLE(S):
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 The reminders feature was the biggest struggle I encountered by far because at first I tried using the Notification API to generate browser notifications which worked on desktop, but then when I tested on mobile it crashed the whole app / website when a notification would try to send. I found the reason for this was because mobile browsers require you to register a 'Service Worker' before sending notifications as they have tighter restrictions on how notifications must be shown compared to desktop browsers.
+
+WHAT I LEARNT:
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+• **React** - State management, component life-cycle, dynamic rendering, barrel files to group exports, portals, hooks such as: useState, useRef, useId, useContext as well as custom hooks and advanced codebase architecture.
+
+• **JavaScript** - Using regex to dynamically inject symbols or whatever you want inside input boxes, classes such as Date, String, Boolean, RegExp, Notification, array and object destructuring, immutable array and object management using spread a functions that return new arrays (map, filter etc), how to properly validate using slice function, dynamic object property creation, native array and object methods such as Array.from(), Object.values() etc and helper functions
 
 PLANS FOR FUTURE FEATURES / UPDATES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -33,7 +39,7 @@ WHAT IM GOING TO LEARN NEXT:
 • **Shadcn UI library + tailwind** - I personally like using regular old CSS files which is why I use CSS modules in this project, however, these tools seem to used a lot in real-world projects so I will broaden my horizon of knowledge even further by learning these.
 
 • **Typescript** - Apparently no one uses Vanilla JS anymore! Once I spent some more time getting comfortable with Vanilla JS, I'll look into this.
-
+ 
 **How to use:** if you want to try it out, ensure you are using either the Chrome, Edge or Safari browser, and if you use Safari you must add it to your phone screen so it becomes a little app icon on your phone so the browser notifications actually work.
 
 **Project Here:** [https://tcurry-git.github.io/to-do-list/](https://tcurry-git.github.io/to-do-list/)
