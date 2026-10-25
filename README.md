@@ -14,7 +14,7 @@ This project was created because I wanted to learn more about JavaScript so I'd 
 
 BIGGEST STRUGGLE(S):
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-The reminders feature was the biggest struggle I encountered by far because at first I tried using the Notification API to generate browser notifications which worked on desktop, but then when I tested on mobile it crashed the whole app / website when a notification would try to send. I found the reason for this was because mobile browsers require you to register a 'Service Worker' before sending notifications as they have tighter restrictions on how notifications must be shown compared to desktop browsers.
+The reminders feature was the biggest struggle I encountered by far because at first I tried using the Notification API to generate browser notifications which worked on desktop, but then when I tested on mobile it crashed the whole app / website when a notification would try to send. I found out the reason for this was because mobile browsers require you to register a 'Service Worker' before sending notifications as they have tighter restrictions on how notifications must be shown compared to desktop browsers.
 
 WHAT I LEARNT:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ WHAT I LEARNT:
 
 • **JavaScript** - Using regex to dynamically inject symbols or whatever you want inside input boxes, classes such as Date, String, Boolean, RegExp, Notification, array and object destructuring, immutable array and object management using spread a functions that return new arrays (map, filter etc), how to properly validate using slice function, dynamic object property creation, native array and object methods such as Array.from(), Object.values() etc and helper functions
 
-PLANS FOR FUTURE FEATURES / UPDATES (:
+PLANS FOR FUTURE FEATURES / UPDATES (CURRENTLY WORKING ON AN UPDATE):
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 • **General refactoring of the codebase** - Making code more maintainable by reducing complexity of adding new features and making code more efficient by using useReducer hook more efficient methods overall 
 
