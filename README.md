@@ -4,7 +4,7 @@ Timeline: **SEPT 2026 - NOW (ONGOING)**
 
 Stack: **HTML, CSS, JS, React, Vite**
 
-**Project Here:** https://tcurry-git.github.io/to-do-list/
+**Live Site Here:** https://tcurry-git.github.io/to-do-list/
 
 WHAT IT DOES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
