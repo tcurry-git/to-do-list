@@ -4,6 +4,8 @@ Timeline: **SEPT 2026 - NOW (ONGOING)**
 
 Stack: **HTML, CSS, JS, React, Vite**
 
+**Project Here:** https://tcurry-git.github.io/to-do-list/
+
 WHAT IT DOES:
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This project allows to add tasks and then create your own task with a desired deadline. You can do basic things like favourite the task, mark the task as completed, delete the task but the more useful features give you the ability to edit a task you've already created and set reminders for specific tasks. There's also a search bar for finding tasks which is good if you have a lot of ongoing tasks you need to manage, there's also sorting and global task management where you can sort by deadline, unfavourite all tasks and delete all tasks. The reminders are just browser notifications not system push notifications so its practical use is limited, but this is fine because that wasn't the aim, the aim was just to learn JS and have a basic project to show at the end of it, and I've succeeded in that sense. Finally, I implemented error messages in the form of tooltips for the input fields, and a site wide announcer that announces actions that have been completed to screen readers.
@@ -43,5 +45,3 @@ WHAT IM GOING TO LEARN NEXT (WHEN PROJECT IS FULLY FINISHED):
 • **Typescript** - Apparently no one uses Vanilla JS anymore! Once I spent some more time getting comfortable with Vanilla JS, I'll look into this and probably slowly refactor my entire codebase.
  
 **How to use:** if you want to try it out, ensure you are using either the Chrome, Edge or Safari browser, and if you use Safari you must add it to your phone screen so it becomes a little app icon on your phone so the browser notifications actually work.
-
-**Project Here:** https://tcurry-git.github.io/to-do-list/
