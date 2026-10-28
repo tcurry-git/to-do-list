@@ -36,6 +36,8 @@ PLANS FOR FUTURE FEATURES / UPDATES (CURRENTLY WORKING ON AN UPDATE):
 
 • **Bug Report / Feature suggestions section** - Would exist inside a menu where users can enter the title of their bug/feature and then explain more about in a text box below. Unsure how I could implement this just yet however I assume I'd need some kind of 'inbox' which would need to be handled via my own API and back-end. Requests are sent through my back-end and then planted inside some 'inbox'. Plus, I need to thinking about rate limiting and profanity filtering.
 
+• **Ability to restore deleted tasks**: All deleted tasks will be sent to a 'recycle bin' type idea where they will live for 7 days before being permanently deleted. This is so users who accidentally delete tasks don't have to re-type the task they can just go the menu, and click 'restore' and it will replaced in the main task list.
+
 WHAT IM GOING TO LEARN NEXT (WHEN PROJECT IS FULLY FINISHED):
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 • **Service workers + push notifications API** - Learn more in-depth about how service workers work and how to send push notifications to make the site more usable. Glossed over service workers when I was implementing the browser notification that acted as reminders feature.
